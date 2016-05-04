@@ -10,7 +10,6 @@ USING_NS_CC;
 using namespace std;
 class MyGame : public Layer {
 private:
-	TMXLayer* food_layer;
 	Sprite* progress[foods_num];
 	float progress_length;
 public:
@@ -46,6 +45,7 @@ public:
 	virtual void update(float dt);
 	void update_dir();
 	void game_over(gameOverState state);
+	void print_log(string str);
 	void set_pause(bool pause);
 	bool isUpdate;
 	int bug, flower, kill;

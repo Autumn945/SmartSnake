@@ -1,6 +1,8 @@
 #include "AppDelegate.h"
 #include "SystemHeader.h"
 #include "HelloWorldScene.h"
+#include "cocos2d.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -32,7 +34,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0f / 60);
 
-    FileUtils::getInstance()->addSearchPath("res");
+	FileUtils::getInstance()->addSearchPath("res");
+	FileUtils::getInstance()->addSearchPath("music");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("start.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("play.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("pang.wav");
 
     // create a scene. it's an autorelease object
     auto scene = HelloWorld::createScene();

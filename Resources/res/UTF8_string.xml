@@ -60,39 +60,79 @@
     <string>饥饿值：</string>
     <key>broken</key>
     <string>碎了！</string>
+    
+    <key>eat green_apple</key>
+    <string>
+吃了一个绿苹果
+走起路来更快了
+</string>
+    <key>eat red_apple</key>
+    <string>
+吃了一个红苹果
+我要慢慢走
+</string>
+    <key>eat bird</key>
+    <string>
+吃了一只小小鸟
+肚子饱饱的
+</string>
+    <key>eat cola</key>
+    <string>
+喝了杯可乐
+等下又可以多休
+息一会了
+</string>
+    <key>eat bug</key>
+    <string>
+吃了一条小虫子
+离目标又进一步了
+</string>
+    <key>eat flower</key>
+    <string>
+吃了一朵小花
+离目标又进一步了
+</string>
+    <key>eat heart</key>
+    <string>
+获得了一颗爱心
+感觉浑身充满了
+正能量
+</string>
+    <key>eat shit</key>
+    <string>
+踩到便便了
+感觉自己萌萌哒
+</string>
+    
     <key>no way</key>
     <string>
-以为
-前面还有路
-然而...</string>
+无路可走了
+</string>
     <key>impact snake</key>
     <string>
-以为
-别的蛇是软的
-就去撞了一下
-然而...</string>
+撞蛇啦
+</string>
     <key>impact wall</key>
     <string>
-以为
-自己会爬墙
-然而...</string>
+撞墙啦
+</string>
     <key>eat too much shit</key>
     <string>
-以为
-便便没毒
-就多吃了点
-然而...</string>
+便便踩多了
+心都碎了
+</string>
     <key>starvation</key>
     <string>
-以为
-自己不饿
-然而...</string>
+饿得太久了
+心都碎了
+</string>
     <key>i do not know</key>
     <string>
 不知不觉
 不明不白
 就这样挂了</string>
 
+    
     <!--default string-->
     <key>undefinition</key>
     <string>未定义</string>

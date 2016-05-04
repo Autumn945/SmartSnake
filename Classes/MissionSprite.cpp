@@ -43,12 +43,15 @@ bool Mission::init(int id) {
 	string id_string = Value(id).asString();
 	if (user_info.count("mission_score" + id_string) == 0) {
 		user_info["mission_score" + id_string] = 0;
+		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	}
 	if (user_info.count("mission_success" + id_string) == 0) {
 		user_info["mission_success" + id_string] = 0;
+		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	}
 	if (user_info.count("mission_challenge" + id_string) == 0) {
 		user_info["mission_challenge" + id_string] = 0;
+		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	}
 	score = user_info["mission_score" + id_string].asInt();
 	success = user_info["mission_success" + id_string].asInt();
@@ -63,9 +66,19 @@ bool Mission::init(int id) {
 	y -= name->getContentSize().height + 10;
 	int flo = get_flower();
 	auto sp_f = Sprite::create("flower.png");
+	auto current_mission = user_info["current_mission"].asInt();
+	if (current_mission < id) {
+		flo = 1;
+		sp_f = Sprite::create("block.png");
+	}
+	else if (current_mission == id) {
+		flo = 1;
+		sp_f = Sprite::create("flag.png");
+	}
 	float x = center.x - sp_f->getContentSize().width * flo * 0.5;
 	for (int i = 0; i < flo; i++) {
-		auto sp = Sprite::create("flower.png");
+		auto sp = Sprite::create();
+		sp->setSpriteFrame(sp_f->getSpriteFrame());
 		sp->setAnchorPoint(Vec2(0, 1));
 		sp->setPosition(x, y);
 		x += sp->getContentSize().width;

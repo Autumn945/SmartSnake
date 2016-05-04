@@ -1,6 +1,7 @@
 #include "GameMenuScene.h"
 #include "MainMenuScene.h"
 #include "MyGameScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 using namespace std;
@@ -18,6 +19,9 @@ bool GameMenu::init() {
 	}
 	//add menu back_to_main_menu
 	auto menu_back = MenuItemFont::create(get_UTF8_string("back"), [](Ref *sender) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		auto next_scene = MainMenu::createScene();
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 		Director::getInstance()->replaceScene(Transition_scene);
@@ -39,7 +43,13 @@ bool GameMenu::init() {
 		pos.x /= 256;
 		pos.y /= 160;
 		int tag = floor(pos.y) * 5 + floor(pos.x);
-		select_mission = (Mission*)this->getChildByTag(tag + 1);
+		auto current_mission = user_info["current_mission"].asInt();
+		if (tag < current_mission) {
+			select_mission = (Mission*)this->getChildByTag(tag + 1);
+		}
+		else {
+			select_mission = NULL;
+		}
 		if (select_mission) {
 			select_mission->setScale(1.2f);
 		}
@@ -56,6 +66,10 @@ bool GameMenu::init() {
 	};
 	listener->onTouchEnded = [this](Touch *t, Event *e) {
 		if(select_mission) {
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
+			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 			auto next_scene = MyGame::createScene(select_mission->getTag());
 			auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 			Director::getInstance()->replaceScene(Transition_scene);
@@ -70,7 +84,7 @@ bool GameMenu::init() {
 		if (!mission) {
 			break;
 		}
-		log("--   %d -> %d", i, mission->get_game_map());
+		log("create mission %d", i);
 		if (mission->get_score() > 0) {
 			max_mission = i;
 		}
@@ -80,6 +94,10 @@ bool GameMenu::init() {
 		//mission->setAnchorPoint(Vec2(0, 1));
 		mission->setPosition(x, y);
 		this->addChild(mission);
+	}
+
+	if (!CocosDenshion::SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying() && user_info["music"].asInt() == 0) {
+		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("start.wav", true);
 	}
 	return true;
 }

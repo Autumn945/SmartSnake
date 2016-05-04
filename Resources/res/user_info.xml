@@ -3,42 +3,57 @@
 
 <plist version="1.0">
     <dict>
-        <key>mission_challenge2</key>
+        <key>control_mode</key>
+        <integer>0</integer>
+        <key>music</key>
+        <integer>1</integer>
+        <key>mission_success1</key>
+        <integer>1</integer>
+        <key>soundEffects</key>
+        <integer>1</integer>
+        <key>mission_score6</key>
+        <integer>0</integer>
+        <key>current_mission</key>
         <integer>2</integer>
         <key>mission_score1</key>
-        <integer>2600</integer>
-        <key>mission_success1</key>
-        <integer>5</integer>
-        <key>mission_score2</key>
-        <integer>3200</integer>
+        <integer>1500</integer>
         <key>mission_challenge1</key>
-        <integer>28</integer>
+        <integer>3</integer>
+        <key>mission_score2</key>
+        <integer>0</integer>
         <key>mission_success2</key>
-        <integer>2</integer>
+        <integer>0</integer>
+        <key>mission_challenge2</key>
+        <integer>1</integer>
         <key>mission_score3</key>
-        <integer>7800</integer>
+        <integer>0</integer>
         <key>mission_success3</key>
-        <integer>2</integer>
+        <integer>0</integer>
         <key>mission_challenge3</key>
-        <integer>7</integer>
+        <integer>0</integer>
         <key>mission_score4</key>
         <integer>0</integer>
         <key>mission_success4</key>
         <integer>0</integer>
         <key>mission_challenge4</key>
-        <integer>5</integer>
+        <integer>0</integer>
         <key>mission_score5</key>
-        <integer>1000</integer>
+        <integer>0</integer>
         <key>mission_success5</key>
-        <integer>2</integer>
+        <integer>0</integer>
+        <key>clear</key>
+        <integer>0</integer>
         <key>mission_challenge5</key>
-        <integer>12</integer>
-        <key>mission_score6</key>
         <integer>0</integer>
         <key>mission_success6</key>
-        <integer>4</integer>
+        <integer>0</integer>
         <key>mission_challenge6</key>
-        <integer>7</integer>
-        <key>control_mode</key>
+        <integer>0</integer>
+        <key>mission_score7</key>
+        <integer>0</integer>
+        <key>mission_success7</key>
+        <integer>0</integer>
+        <key>mission_challenge7</key>
+        <integer>0</integer>
     </dict>
 </plist>

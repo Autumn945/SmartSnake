@@ -2,6 +2,7 @@
 #include "SystemHeader.h"
 #include "GameMenuScene.h"
 #include "OptionScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 //using namespace std;
@@ -18,6 +19,20 @@ bool MainMenu::init() {
 		return false;
 	}
 	log("MainMenu init");
+
+	if (user_info.count("control_mode") == 0) {
+		user_info["control_mode"] = 0;
+	}
+	if (user_info.count("soundEffects") == 0) {
+		user_info["soundEffects"] = 0;
+	}
+	if (user_info.count("music") == 0) {
+		user_info["music"] = 0;
+	}
+	if (user_info.count("current_mission") == 0) {
+		user_info["current_mission"] = 1;
+	}
+	FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	//(0.5, 1 - 0.618)
 	auto position = Vec2(origin.x + visible_size.width / 2
 		, origin.y + visible_size.height * (1 - 0.618));
@@ -25,6 +40,9 @@ bool MainMenu::init() {
 	// scene turn to option function
 	auto create_menu_turn_to_option = [](string name) {
 		return MenuItemFont::create(get_UTF8_string(name), [name](Ref *sender) {
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
 			auto next_scene = Option::createScene(name);
 			auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 			Director::getInstance()->replaceScene(Transition_scene);
@@ -34,6 +52,10 @@ bool MainMenu::init() {
 	//main menu
 	auto menu_start = MenuItemFont::create(get_UTF8_string("start"), [=](Ref *sender) {
 		log("hit start");
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
+		//CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 		auto next_scene = GameMenu::createScene();
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene); 
 		Director::getInstance()->replaceScene(Transition_scene);
@@ -42,7 +64,10 @@ bool MainMenu::init() {
 	auto menu_option_help = create_menu_turn_to_option("help");
 	auto menu_option_about = create_menu_turn_to_option("about");
 	auto menu_option_feedback = create_menu_turn_to_option("feedback");
-	auto menu_exit = MenuItemFont::create(get_UTF8_string("exit"), [=](Ref *sender) {
+	auto menu_exit = MenuItemFont::create(get_UTF8_string("exit"), [](Ref *sender) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		Director::getInstance()->end();
 	});
 
@@ -94,6 +119,9 @@ bool MainMenu::init() {
 		if (ac_turn_mid->isDone() + ac_turn_mid->getTag() == 0) {
 			return;
 		}
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("turn.wav");
+		}
 		//if ac_turn_mid has been run, set tag = 0
 		ac_turn_mid->setTag(0);
 		//run action
@@ -112,6 +140,9 @@ bool MainMenu::init() {
 	auto menu_turn_right = MenuItemFont::create("  >  ", [=](Ref *sender) {
 		if (ac_turn_mid->isDone() + ac_turn_mid->getTag() == 0) {
 			return;
+		}
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("turn.wav");
 		}
 		//if ac_turn_mid has been run, set tag = 0
 		ac_turn_mid->setTag(0);
@@ -147,5 +178,8 @@ bool MainMenu::init() {
 	vector_menu[menu_id]->setRotation3D(Vec3(0, 0, 0));
 	vector_menu[menu_id]->setOpacity(255);
 	vector_menu[menu_id]->setVisible(true);
+	if (!CocosDenshion::SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying() && user_info["music"].asInt() == 0) {
+		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("start.wav", true);
+	}
 	return true;
 }

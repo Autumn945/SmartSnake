@@ -1,6 +1,7 @@
 #include "OptionScene.h"
 #include "SystemHeader.h"
 #include "MainMenuScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 using namespace std; 
@@ -33,6 +34,9 @@ bool Option::init() {
 	}
 	//add menu back_to_main_menu
 	auto menu_back = MenuItemFont::create(get_UTF8_string("back"), [](Ref *sender) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 		auto next_scene = MainMenu::createScene(); 
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene); 
@@ -61,17 +65,23 @@ bool Option::init() {
 		music->setPosition(pos_left);
 		this->addChild(music);
 		auto menu_music = MenuItemToggle::createWithCallback([](Ref *sender) {
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
 			auto item = (MenuItemToggle*)sender;
 			int index = item->getSelectedIndex();
 			user_info["music"] = index;
+			if (index == 1) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+			}
+			else {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("start.wav");
+			}
 			log("%d", index);
 		}
 			, MenuItemFont::create("On")
 			, MenuItemFont::create("Off")
 			, NULL);
-		if (user_info.count("music") == 0) {
-			user_info["music"] = 0;
-		}
 		menu_music->setSelectedIndex(user_info["music"].asInt());
 		menu_music->setAnchorPoint(Vec2(0, 0));
 		menu_music->setPosition(right, pos_left.y);
@@ -83,6 +93,9 @@ bool Option::init() {
 		soundEffects->setPosition(pos_left);
 		this->addChild(soundEffects);
 		auto menu_soundEffects = MenuItemToggle::createWithCallback([](Ref *sender) {
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
 			auto item = (MenuItemToggle*)sender;
 			int index = item->getSelectedIndex();
 			user_info["soundEffects"] = index;
@@ -91,9 +104,6 @@ bool Option::init() {
 			, MenuItemFont::create("On")
 			, MenuItemFont::create("Off")
 			, NULL);
-		if (user_info.count("soundEffects") == 0) {
-			user_info["soundEffects"] = 0;
-		}
 		menu_soundEffects->setSelectedIndex(user_info["soundEffects"].asInt());
 		menu_soundEffects->setAnchorPoint(Vec2(0, 0));
 		menu_soundEffects->setPosition(right, pos_left.y);
@@ -105,6 +115,9 @@ bool Option::init() {
 		control_mode->setPosition(pos_left);
 		this->addChild(control_mode);
 		auto menu_control_mode = MenuItemToggle::createWithCallback([](Ref *sender) {
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
 			auto item = (MenuItemToggle*)sender;
 			int index = item->getSelectedIndex();
 			user_info["control_mode"] = index;
@@ -114,15 +127,15 @@ bool Option::init() {
 			, MenuItemFont::create(get_UTF8_string("slide"))
 			, MenuItemFont::create(get_UTF8_string("touch"))
 			, NULL);
-		if (user_info.count("control_mode") == 0) {
-			user_info["control_mode"] = 0;
-		}
 		menu_control_mode->setSelectedIndex(user_info["control_mode"].asInt());
 		menu_control_mode->setAnchorPoint(Vec2(0, 0));
 		menu_control_mode->setPosition(right, pos_left.y);
 		menu->addChild(menu_control_mode);
 		pos_left.y -= control_mode->getContentSize().height;
 		auto menu_clear = MenuItemFont::create(get_UTF8_string("clear_user_info"), [](Ref *sender) {
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
 			user_info["clear"] = user_info["clear"].asInt() + 1;
 			if (user_info["clear"].asInt() >= 5) {
 				user_info.clear();

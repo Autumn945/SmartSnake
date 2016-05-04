@@ -3,6 +3,7 @@
 #include "Snake.h"
 #include "SmartSnake.h"
 #include "GameMenuScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 using namespace std;
@@ -32,10 +33,10 @@ Scene* MyGame::createScene(int mission_id) {
 }
 
 bool MyGame::init(int mission_id) {
+	log("my game init");
 	if (!Layer::init()) {
 		return false;
 	}
-	log("my game init");
 	auto mission = Mission::create(mission_id);
 	if (!mission) {
 		return false;
@@ -50,9 +51,7 @@ bool MyGame::init(int mission_id) {
 	sprite_ban = Sprite::create("ban.png");
 	sprite_ban->setVisible(false);
 	this->addChild(sprite_ban, 100);
-	log("%d", game_map);
 	this->addChild(game_map);
-	log("test");
 	auto bug_v = game_map->getProperty("bug");
 	auto flower_v = game_map->getProperty("flower");
 	auto kill_v = game_map->getProperty("kill");
@@ -70,8 +69,6 @@ bool MyGame::init(int mission_id) {
 	kill = kill_v.asInt();
 	auto snake_obj_group = game_map->getObjectGroup("snake_objs");
 	CCASSERT(snake_obj_group, "snake_objs has not defined!");
-	food_layer = game_map->getLayer("food");
-	CCASSERT(food_layer, "food_layer has not defined!");
 	auto snake_objs = snake_obj_group->getObjects();
 	snakes.clear();
 	snakes.push_back(Snake::create("player", game_map));
@@ -210,6 +207,10 @@ bool MyGame::init(int mission_id) {
 	}
 	y = origin.y;
 	menu_back = MenuItemFont::create(get_UTF8_string("abandon"), [this](Ref *sender) {
+		CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		string id_string = Value(this->getTag()).asString();
 		user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
 		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
@@ -221,6 +222,9 @@ bool MyGame::init(int mission_id) {
 	menu_back->setPosition(origin.x + visible_size.width, y);
 	y += menu_back->getContentSize().height + 10;
 	menu_again = MenuItemFont::create(get_UTF8_string("again"), [this](Ref *sender) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		string id_string = Value(this->getTag()).asString();
 		user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
 		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
@@ -233,6 +237,9 @@ bool MyGame::init(int mission_id) {
 	auto font_size = MenuItemFont::getFontSize();
 	MenuItemFont::setFontSize(BIG_LABEL_FONT_SIZE + 10);
 	menu_pause = MenuItemToggle::createWithCallback([this](Ref *ref) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		if (isUpdate) {
 			if (pause_n <= 0) {
 				game_map->setVisible(false);
@@ -255,6 +262,9 @@ bool MyGame::init(int mission_id) {
 		);
 	MenuItemFont::setFontSize(font_size);
 	auto menu_start = MenuItemFont::create(get_UTF8_string("start"), [this](Ref *sender) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		((Node*)sender)->setVisible(false);
 		menu_pause->setVisible(true);
 		menu_again->setVisible(false);
@@ -281,6 +291,9 @@ bool MyGame::init(int mission_id) {
 	this->addChild(turn_1);
 	this->addChild(turn_2);
 	menu_clear_dir = MenuItemFont::create(" X ", [this](Ref *sender) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+		}
 		snakes[0]->turn_1 = -1;
 		snakes[0]->turn_2 = -1;
 		update_dir();
@@ -402,6 +415,11 @@ bool MyGame::init(int mission_id) {
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_touch, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_key, this);
+
+
+	if (user_info["music"].asInt() == 0) {
+		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("play.wav", true);
+	}
 	return true;
 }
 
@@ -432,9 +450,11 @@ void MyGame::update(float dt) {
 		}
 		if (is_died) {
 			game_over(no_way);
+			return;
 		}
 		if (!can_go && get_heart() > 0) {
 			add_heart(-1);
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pang.wav");
 			auto label_heart = (Label*)this->getChildByName("label_heart");
 			label_heart->setString(" x" + Value(this->get_heart()).asString());
 			Device::vibrate(0.5);
@@ -458,7 +478,7 @@ void MyGame::update(float dt) {
 				remain_num[i]--;
 				auto pos = game_map->get_random_empty_point();
 				if (pos.first >= 0) {
-					food_layer->setTileGID(i + 1, Vec2(pos.first, pos.second));
+					game_map->get_food()->setTileGID(i + 1, Vec2(pos.first, pos.second));
 				}
 			}
 			float width = current_cooldown[i] / cooldown[i] * progress_length;
@@ -498,10 +518,11 @@ void MyGame::update(float dt) {
 			else {
 				game_over(gameOverState::eat_shit);
 			}
+			return;
 		}
 	}
 	time_b = clock() - time_b;
-	if(time_b > 10) log("delay = %d", time_b);
+	log("delay = %d", time_b);
 }
 
 void MyGame::update_dir() {
@@ -541,6 +562,7 @@ void MyGame::game_over(gameOverState state) {
 	if (state == win) {
 		user_info["mission_score" + id_string] = max(get_score(), user_info["mission_score" + id_string].asInt());
 		user_info["mission_success" + id_string] = user_info["mission_success" + id_string].asInt() + 1;
+		user_info["current_mission"] = this->getTag() + 1;
 		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 
 		auto label = Label::createWithSystemFont(get_UTF8_string("win"), "abc", MID_LABEL_FONT_SIZE);
@@ -552,6 +574,9 @@ void MyGame::game_over(gameOverState state) {
 		auto next_mission_scene = MyGame::createScene(this->getTag() + 1);
 		if (next_mission_scene) {
 			auto menu_next = MenuItemFont::create(get_UTF8_string("next_mission"), [this](Ref* sender) {
+				if (user_info["soundEffects"].asInt() == 0) {
+					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+				}
 				auto next_mission_scene = MyGame::createScene(this->getTag() + 1);
 				auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_mission_scene);
 				Director::getInstance()->replaceScene(Transition_scene);
@@ -592,14 +617,23 @@ void MyGame::game_over(gameOverState state) {
 		}
 		auto label_heart = (Label*)this->getChildByName("label_heart");
 		label_heart->setString(get_UTF8_string("broken"));
-		auto label_score = (Label*)this->getChildByName("label_score");
-		Label* label = Label::createWithSystemFont(get_UTF8_string(str), "abc", SMALL_LABEL_FONT_SIZE);
-		log("%s", get_UTF8_string(str).c_str());
-		label->setAnchorPoint(Vec2(0, 1));
-		label->setPosition(label_score->getPosition() - Vec2(0, label_score->getContentSize().height + 5));
-		label->setColor(Color3B::RED);
-		this->addChild(label);
+		print_log(str);
 	}
+}
+
+void MyGame::print_log(string str) {
+	auto label_score = (Label*)this->getChildByName("label_score");
+	auto label_log = (Label*)this->getChildByName("label_log");
+	if (!label_log) {
+		label_log = Label::createWithSystemFont("", "abc", SMALL_LABEL_FONT_SIZE);
+		label_log->setName("label_log");
+		this->addChild(label_log);
+	}
+	label_log->setString(get_UTF8_string(str));
+	//log("%s", get_UTF8_string(str).c_str());
+	label_log->setAnchorPoint(Vec2(0, 1));
+	label_log->setPosition(label_score->getPosition() - Vec2(0, label_score->getContentSize().height + 5));
+	label_log->setColor(Color3B::RED);
 }
 
 void MyGame::set_pause(bool pause) {
