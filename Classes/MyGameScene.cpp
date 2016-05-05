@@ -72,7 +72,13 @@ bool MyGame::init(int mission_id) {
 	auto snake_objs = snake_obj_group->getObjects();
 	snakes.clear();
 	snakes.push_back(Snake::create("player", game_map));
-	CCASSERT(snakes[0], "snakes[0] has not defined!");
+	//CCASSERT(snakes[0], "snakes[0] has not defined!");
+	has_player = true;
+	if (!snakes[0]) {
+		snakes.clear();
+		has_player = false;
+		log("player has not defined!");
+	}
 	for (auto snake_v : snake_objs) {
 		auto snake_vm = snake_v.asValueMap();
 		auto snake_name = snake_vm["name"].asString();
@@ -93,6 +99,288 @@ bool MyGame::init(int mission_id) {
 			}
 		}
 	}
+	if (has_player) {
+		set_UI();
+		set_Ctrl();
+	}
+
+	scheduleUpdate();
+	return true;
+}
+
+void MyGame::update(float dt) {
+	if (has_player && bug <= 0 && flower <= 0 && kill <= 0) {
+		game_over(win);
+		return;
+	}
+	bool player_go = false;
+	if (has_player && snakes[0]->get_step() >= Snake::step_length) {
+		player_go = true;
+		int dir = snakes[0]->get_current_dir();
+		if (snakes[0]->turn_1 >= 0) {
+			dir = snakes[0]->turn_1;
+		}
+		bool is_died = true;
+		bool can_go = false;
+		for (int i = 0; i < 4; i++) {
+			if (abs(i - snakes[0]->get_current_dir()) == 2) {
+				continue;
+			}
+			if (game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), i))) {
+				is_died = false;
+				if (i == dir) {
+					can_go = true;
+				}
+			}
+		}
+		if (is_died) {
+			game_over(no_way);
+			return;
+		}
+		if (!can_go && get_heart() > 0) {
+			add_heart(-1);
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pang.wav");
+			auto label_heart = (Label*)this->getChildByName("label_heart");
+			label_heart->setString(" x" + Value(this->get_heart()).asString());
+			Device::vibrate(0.5);
+			sprite_ban->setPosition(snakes[0]->convertToWorldSpace(
+				snakes[0]->get_snake_nodes()->back()->getPosition() + UNIT * Vec2(dir_vector[dir].first, -dir_vector[dir].second)));
+			auto action = Blink::create(2, 5);
+			sprite_ban->setVisible(true);
+			sprite_ban->runAction(action);
+			//snakes[0]->turn_1 = snakes[0]->turn_2 = -1;
+			set_pause(true);
+			//update_dir();
+			return;
+		}
+	}
+	auto fps = Director::getInstance()->getAnimationInterval();
+	for (int i = 0; i < foods_num; i++) {
+		if (remain_num[i] > 0) {
+			current_cooldown[i] += fps;
+			if (current_cooldown[i] > cooldown[i]) {
+				current_cooldown[i] -= cooldown[i];
+				remain_num[i]--;
+				auto pos = game_map->get_random_empty_point();
+				if (pos.first >= 0) {
+					game_map->get_food()->setTileGID(i + 1, Vec2(pos.first, pos.second));
+				}
+			}
+			if (has_player) {
+				float width = current_cooldown[i] / cooldown[i] * progress_length;
+				if (width < 0.5 || remain_num[i] == 0) {
+					progress[i]->setVisible(false);
+				}
+				else {
+					progress[i]->setVisible(true);
+					progress[i]->setScaleX(width / progress[i]->getContentSize().width);
+				}
+			}
+		}
+	}
+	auto time_b = clock();
+	for (auto snake : snakes) {
+		snake->go_step();
+	}
+	for (auto snake : snakes) {
+		if (!snake->get_is_checked()) {
+			snake->check();
+		}
+	}
+	int alive = 0;
+	for (auto snake : snakes) {
+		if (!snake->get_is_died()) {
+			alive++;
+		}
+	}
+	if (!has_player && alive == 0) {
+		this->removeAllChildren();
+		this->init(this->getTag());
+	}
+	if (has_player && !snakes[0]->get_is_died() && player_go) {
+		update_dir();
+		auto label_hunger = (Label*)this->getChildByName("label_hunger");
+		label_hunger->setString(get_UTF8_string("hunger") + Value(snakes[0]->get_hunger()).asString() + "/" + Value(max_hunger).asString());
+		bool hungry = false;
+		if (snakes[0]->get_hunger() >= max_hunger) {
+			snakes[0]->add_hunger(-20);
+			this->add_heart(-1);
+			hungry = true;
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("hunger.wav");
+			}
+		}
+		auto label_heart = (Label*)this->getChildByName("label_heart");
+		label_heart->setString(" x" + Value(this->get_heart()).asString());
+		if (this->get_heart() < 0) {
+			if (hungry) {
+				game_over(gameOverState::hungry);
+			}
+			else {
+				game_over(gameOverState::eat_shit);
+			}
+			return;
+		}
+	}
+	time_b = clock() - time_b;
+	if (time_b > 20) {
+		("delay = %d", time_b);
+	}
+}
+
+void MyGame::update_dir() {
+	if (snakes[0]->turn_1 >= 0) {
+		turn_1->setVisible(true);
+		turn_1->setRotation(90 * snakes[0]->turn_1);
+		if (snakes[0]->turn_2 >= 0) {
+			turn_2->setVisible(true);
+			turn_2->setRotation(90 * snakes[0]->turn_2);
+		}
+		else {
+			turn_2->setVisible(false);
+		}
+		menu_clear_dir->setVisible(true);
+	}
+	else {
+		turn_1->setVisible(false);
+		turn_2->setVisible(false);
+		menu_clear_dir->setVisible(false);
+	}
+}
+
+void MyGame::game_over(gameOverState state) {
+	unscheduleUpdate();
+	CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+	string id_string = Value(this->getTag()).asString();
+	menu_back->setString(get_UTF8_string("back"));
+	menu_back->setVisible(true);
+	menu_again->setVisible(true);
+	menu_pause->setVisible(false);
+	turn_1->setVisible(false);
+	turn_2->setVisible(false);
+	menu_clear_dir->setVisible(false);
+	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_key);
+	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_touch);
+	auto label_pause = (Label*)this->getChildByName("label_pause");
+	label_pause->setVisible(false);
+	if (state == win) {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("win.wav");
+		}
+		auto pre_score = user_info["mission_score" + id_string].asInt();
+		auto str = get_UTF8_string("complete");
+		add_score(get_heart() * 300);
+		add_score((get_max_hunger() - snakes[0]->get_hunger()) * 5);
+		if (get_score() > pre_score) {
+			user_info["mission_score" + id_string] = get_score();
+			if (pre_score > 0) {
+				if (user_info["soundEffects"].asInt() == 0) {
+					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("yaho.wav");
+				}
+				str = get_UTF8_string("complete") + get_UTF8_string("new_max_score")
+					+ Value(pre_score).asString() + "-->" + Value(get_score()).asString();
+			}
+		}
+		print_log(str);
+		user_info["mission_success" + id_string] = user_info["mission_success" + id_string].asInt() + 1;
+		user_info["current_mission"] = this->getTag() + 1;
+		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
+
+		auto label = Label::createWithSystemFont(get_UTF8_string("win"), "abc", MID_LABEL_FONT_SIZE);
+		label->setColor(Color3B::RED);
+		label->setAnchorPoint(menu_pause->getAnchorPoint());
+		label->setPosition(menu_pause->getPosition());
+		this->addChild(label);
+
+		auto next_mission = Mission::create(this->getTag() + 1);
+		if (next_mission) {
+			auto menu_next = MenuItemFont::create(get_UTF8_string("next_mission"), [this](Ref* sender) {
+				if (user_info["soundEffects"].asInt() == 0) {
+					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+				}
+				auto next_mission_scene = MyGame::createScene(this->getTag() + 1);
+				auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_mission_scene);
+				Director::getInstance()->replaceScene(Transition_scene);
+			});
+			menu_next->setAnchorPoint(menu_pause->getAnchorPoint());
+			menu_next->setPosition(menu_pause->getPosition());
+			menu->addChild(menu_next);
+			label->setPositionY(menu_next->getPositionY() + menu_next->getContentSize().height + 5);
+		}
+	}
+	else {
+		if (user_info["soundEffects"].asInt() == 0) {
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("lose.wav");
+		}
+		auto label_failed = Label::createWithSystemFont(get_UTF8_string("failed"), "abc", BIG_LABEL_FONT_SIZE);
+		label_failed->setColor(Color3B::RED);
+		label_failed->setAnchorPoint(menu_pause->getAnchorPoint());
+		label_failed->setPosition(menu_pause->getPosition());
+		this->addChild(label_failed);
+		string str = "i do not know";
+		switch (state) {
+		case MyGame::hungry:
+			str = "starvation";
+			break;
+		case MyGame::eat_shit:
+			str = "eat too much shit";
+			break;
+		case MyGame::impact_wall:
+			str = "impact wall";
+			break;
+		case MyGame::impact_snake:
+			str = "impact snake";
+			break;
+		case MyGame::no_way:
+			str = "no way";
+			break;
+		case MyGame::win:
+			break;
+		default:
+			break;
+		}
+		auto label_heart = (Label*)this->getChildByName("label_heart");
+		label_heart->setString(get_UTF8_string("broken"));
+		print_log(get_UTF8_string(str));
+	}
+}
+
+void MyGame::print_log(string str) {
+	auto label_score = (Label*)this->getChildByName("label_score");
+	auto label_log = (Label*)this->getChildByName("label_log");
+	if (!label_log) {
+		label_log = Label::createWithSystemFont("", "abc", SMALL_LABEL_FONT_SIZE);
+		label_log->setName("label_log");
+		this->addChild(label_log);
+	}
+	label_log->setString(str);
+	//log("%s", get_UTF8_string(str).c_str());
+	label_log->setAnchorPoint(Vec2(0, 1));
+	label_log->setPosition(label_score->getPosition() - Vec2(0, label_score->getContentSize().height + 5));
+	label_log->setColor(Color3B::RED);
+}
+
+void MyGame::set_pause(bool pause) {
+	if (!(isUpdate ^ pause)) {
+		if (pause) {
+			auto label = (Label*)this->getChildByName("label_pause");
+			label->setVisible(false);
+			this->unscheduleUpdate();
+		}
+		else {
+			auto label = (Label*)this->getChildByName("label_pause");
+			label->setVisible(true);
+			game_map->setVisible(true);
+			this->scheduleUpdate();
+		}
+		menu_back->setVisible(isUpdate);
+		menu_again->setVisible(isUpdate);
+		menu_pause->setSelectedIndex(isUpdate);
+		isUpdate = !isUpdate;
+	}
+}
+
+void MyGame::set_UI() {
 	float x = origin.x + 20, y = origin.y + visible_size.height;
 	auto label_goal = Label::createWithSystemFont(get_UTF8_string("goal"), "abc", MID_LABEL_FONT_SIZE);
 	label_goal->setAnchorPoint(Vec2(0, 1));
@@ -169,7 +457,7 @@ bool MyGame::init(int mission_id) {
 	this->addChild(label_score);
 	y -= label_score->getContentSize().height + 5;
 
-	x = origin.x + visible_size.width - 8 * UNIT + 10; 
+	x = origin.x + visible_size.width - 8 * UNIT + 10;
 	y = origin.y + visible_size.height - 10;
 	for (int i = 0; i < foods_num; i++) {
 		int gid = i + 1;
@@ -205,7 +493,16 @@ bool MyGame::init(int mission_id) {
 			this->addChild(sprite);
 		}
 	}
-	y = origin.y;
+
+	if (user_info["music"].asInt() == 0) {
+		log("play");
+		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("play.wav", true);
+	}
+}
+
+void MyGame::set_Ctrl() {
+	float x = origin.x + visible_size.width - 8 * UNIT + 10;
+	float y = origin.y;
 	menu_back = MenuItemFont::create(get_UTF8_string("abandon"), [this](Ref *sender) {
 		CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 		if (user_info["soundEffects"].asInt() == 0) {
@@ -261,28 +558,15 @@ bool MyGame::init(int mission_id) {
 		NULL
 		);
 	MenuItemFont::setFontSize(font_size);
-	auto menu_start = MenuItemFont::create(get_UTF8_string("start"), [this](Ref *sender) {
-		if (user_info["soundEffects"].asInt() == 0) {
-			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
-		}
-		((Node*)sender)->setVisible(false);
-		menu_pause->setVisible(true);
-		menu_again->setVisible(false);
-		menu_back->setVisible(false);
-		auto label = (Label*)this->getChildByName("label_pause");
-		label->setVisible(true);
-		scheduleUpdate();
-	});
-	menu_start->setAnchorPoint(Vec2(0, 0));
-	menu_start->setPosition(x, y);
+	menu_pause->setVisible(true);
+	menu_again->setVisible(false);
+	menu_back->setVisible(false);
 	menu_pause->setAnchorPoint(Vec2(0, 0));
 	menu_pause->setPosition(x, y);
-	menu_pause->setVisible(false);
 	auto label_pause = Label::createWithSystemFont(" x" + Value(pause_n).asString(), "abc", SMALL_LABEL_FONT_SIZE);
 	label_pause->setName("label_pause");
 	label_pause->setAnchorPoint(Vec2(0, 0));
 	label_pause->setPosition(menu_pause->getPosition() + Vec2(menu_pause->getContentSize().width, 0));
-	label_pause->setVisible(false);
 	this->addChild(label_pause);
 	turn_1 = Sprite::create("arrow.png");
 	turn_2 = Sprite::create("arrow.png");
@@ -301,7 +585,7 @@ bool MyGame::init(int mission_id) {
 	//menu_clear_dir->setAnchorPoint(Vec2(0, 0));
 	menu_clear_dir->setPosition(turn_2->getPosition() + Vec2(turn_2->getContentSize().width + 10, 0));
 	update_dir();
-	menu = Menu::create(menu_back, menu_pause, menu_again, menu_clear_dir, menu_start, NULL);
+	menu = Menu::create(menu_back, menu_pause, menu_again, menu_clear_dir, NULL);
 	menu->setAnchorPoint(Vec2::ZERO);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu);
@@ -415,243 +699,4 @@ bool MyGame::init(int mission_id) {
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_touch, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_key, this);
-
-
-	if (user_info["music"].asInt() == 0) {
-		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("play.wav", true);
-	}
-	return true;
-}
-
-void MyGame::update(float dt) {
-	if (bug <= 0 && flower <= 0 && kill <= 0) {
-		game_over(win);
-		return;
-	}
-	bool player_go = false;
-	if (snakes[0]->get_step() >= Snake::step_length) {
-		player_go = true;
-		int dir = snakes[0]->get_current_dir();
-		if (snakes[0]->turn_1 >= 0) {
-			dir = snakes[0]->turn_1;
-		}
-		bool is_died = true;
-		bool can_go = false;
-		for (int i = 0; i < 4; i++) {
-			if (abs(i - snakes[0]->get_current_dir()) == 2) {
-				continue;
-			}
-			if (game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), i))) {
-				is_died = false;
-				if (i == dir) {
-					can_go = true;
-				}
-			}
-		}
-		if (is_died) {
-			game_over(no_way);
-			return;
-		}
-		if (!can_go && get_heart() > 0) {
-			add_heart(-1);
-			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pang.wav");
-			auto label_heart = (Label*)this->getChildByName("label_heart");
-			label_heart->setString(" x" + Value(this->get_heart()).asString());
-			Device::vibrate(0.5);
-			sprite_ban->setPosition(snakes[0]->convertToWorldSpace(
-				snakes[0]->get_snake_nodes()->back()->getPosition() + UNIT * Vec2(dir_vector[dir].first, -dir_vector[dir].second)));
-			auto action = Blink::create(2, 5);
-			sprite_ban->setVisible(true);
-			sprite_ban->runAction(action);
-			//snakes[0]->turn_1 = snakes[0]->turn_2 = -1;
-			set_pause(true);
-			//update_dir();
-			return;
-		}
-	}
-	auto fps = Director::getInstance()->getAnimationInterval();
-	for (int i = 0; i < foods_num; i++) {
-		if (remain_num[i] > 0) {
-			current_cooldown[i] += fps;
-			if (current_cooldown[i] > cooldown[i]) {
-				current_cooldown[i] -= cooldown[i];
-				remain_num[i]--;
-				auto pos = game_map->get_random_empty_point();
-				if (pos.first >= 0) {
-					game_map->get_food()->setTileGID(i + 1, Vec2(pos.first, pos.second));
-				}
-			}
-			float width = current_cooldown[i] / cooldown[i] * progress_length;
-			if (width < 0.5 || remain_num[i] == 0) {
-				progress[i]->setVisible(false);
-			}
-			else {
-				progress[i]->setVisible(true);
-				progress[i]->setScaleX(width / progress[i]->getContentSize().width);
-			}
-		}
-	}
-	auto time_b = clock();
-	for (auto snake : snakes) {
-		snake->go_step();
-	}
-	for (auto snake : snakes) {
-		if (!snake->get_is_checked()) {
-			snake->check();
-		}
-	}
-	if (!snakes[0]->get_is_died() && player_go) {
-		auto label_hunger = (Label*)this->getChildByName("label_hunger");
-		label_hunger->setString(get_UTF8_string("hunger") + Value(snakes[0]->get_hunger()).asString() + "/" + Value(max_hunger).asString());
-		bool hungry = false;
-		if (snakes[0]->get_hunger() >= max_hunger) {
-			snakes[0]->add_hunger(-20);
-			this->add_heart(-1);
-			hungry = true;
-		}
-		auto label_heart = (Label*)this->getChildByName("label_heart");
-		label_heart->setString(" x" + Value(this->get_heart()).asString());
-		if (this->get_heart() < 0) {
-			if (hungry) {
-				game_over(gameOverState::hungry);
-			}
-			else {
-				game_over(gameOverState::eat_shit);
-			}
-			return;
-		}
-	}
-	time_b = clock() - time_b;
-	log("delay = %d", time_b);
-}
-
-void MyGame::update_dir() {
-	if (snakes[0]->turn_1 >= 0) {
-		turn_1->setVisible(true);
-		turn_1->setRotation(90 * snakes[0]->turn_1);
-		if (snakes[0]->turn_2 >= 0) {
-			turn_2->setVisible(true);
-			turn_2->setRotation(90 * snakes[0]->turn_2);
-		}
-		else {
-			turn_2->setVisible(false);
-		}
-		menu_clear_dir->setVisible(true);
-	}
-	else {
-		turn_1->setVisible(false);
-		turn_2->setVisible(false);
-		menu_clear_dir->setVisible(false);
-	}
-}
-
-void MyGame::game_over(gameOverState state) {
-	unscheduleUpdate();
-	string id_string = Value(this->getTag()).asString();
-	menu_back->setString(get_UTF8_string("back"));
-	menu_back->setVisible(true);
-	menu_again->setVisible(true);
-	menu_pause->setVisible(false);
-	turn_1->setVisible(false);
-	turn_2->setVisible(false);
-	menu_clear_dir->setVisible(false);
-	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_key);
-	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_touch);
-	auto label_pause = (Label*)this->getChildByName("label_pause");
-	label_pause->setVisible(false);
-	if (state == win) {
-		user_info["mission_score" + id_string] = max(get_score(), user_info["mission_score" + id_string].asInt());
-		user_info["mission_success" + id_string] = user_info["mission_success" + id_string].asInt() + 1;
-		user_info["current_mission"] = this->getTag() + 1;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
-
-		auto label = Label::createWithSystemFont(get_UTF8_string("win"), "abc", MID_LABEL_FONT_SIZE);
-		label->setColor(Color3B::RED);
-		label->setAnchorPoint(menu_pause->getAnchorPoint());
-		label->setPosition(menu_pause->getPosition());
-		this->addChild(label);
-
-		auto next_mission_scene = MyGame::createScene(this->getTag() + 1);
-		if (next_mission_scene) {
-			auto menu_next = MenuItemFont::create(get_UTF8_string("next_mission"), [this](Ref* sender) {
-				if (user_info["soundEffects"].asInt() == 0) {
-					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
-				}
-				auto next_mission_scene = MyGame::createScene(this->getTag() + 1);
-				auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_mission_scene);
-				Director::getInstance()->replaceScene(Transition_scene);
-			});
-			menu_next->setAnchorPoint(menu_pause->getAnchorPoint());
-			menu_next->setPosition(menu_pause->getPosition());
-			menu->addChild(menu_next);
-			label->setPositionY(menu_next->getPositionY() + menu_next->getContentSize().height + 5);
-		}
-	}
-	else {
-		auto label_failed = Label::createWithSystemFont(get_UTF8_string("failed"), "abc", BIG_LABEL_FONT_SIZE);
-		label_failed->setColor(Color3B::RED);
-		label_failed->setAnchorPoint(menu_pause->getAnchorPoint());
-		label_failed->setPosition(menu_pause->getPosition());
-		this->addChild(label_failed);
-		string str = "i do not know";
-		switch (state) {
-		case MyGame::hungry:
-			str = "starvation";
-			break;
-		case MyGame::eat_shit:
-			str = "eat too much shit";
-			break;
-		case MyGame::impact_wall:
-			str = "impact wall";
-			break;
-		case MyGame::impact_snake:
-			str = "impact snake";
-			break;
-		case MyGame::no_way:
-			str = "no way";
-			break;
-		case MyGame::win:
-			break;
-		default:
-			break;
-		}
-		auto label_heart = (Label*)this->getChildByName("label_heart");
-		label_heart->setString(get_UTF8_string("broken"));
-		print_log(str);
-	}
-}
-
-void MyGame::print_log(string str) {
-	auto label_score = (Label*)this->getChildByName("label_score");
-	auto label_log = (Label*)this->getChildByName("label_log");
-	if (!label_log) {
-		label_log = Label::createWithSystemFont("", "abc", SMALL_LABEL_FONT_SIZE);
-		label_log->setName("label_log");
-		this->addChild(label_log);
-	}
-	label_log->setString(get_UTF8_string(str));
-	//log("%s", get_UTF8_string(str).c_str());
-	label_log->setAnchorPoint(Vec2(0, 1));
-	label_log->setPosition(label_score->getPosition() - Vec2(0, label_score->getContentSize().height + 5));
-	label_log->setColor(Color3B::RED);
-}
-
-void MyGame::set_pause(bool pause) {
-	if (!(isUpdate ^ pause)) {
-		if (pause) {
-			auto label = (Label*)this->getChildByName("label_pause");
-			label->setVisible(false);
-			this->unscheduleUpdate();
-		}
-		else {
-			auto label = (Label*)this->getChildByName("label_pause");
-			label->setVisible(true);
-			game_map->setVisible(true);
-			this->scheduleUpdate();
-		}
-		menu_back->setVisible(isUpdate);
-		menu_again->setVisible(isUpdate);
-		menu_pause->setSelectedIndex(isUpdate);
-		isUpdate = !isUpdate;
-	}
 }

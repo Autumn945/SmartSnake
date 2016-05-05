@@ -19,7 +19,7 @@ Vec2 GameMap::to_cocos_pos(pii pos) {
 
 bool GameMap::is_wall(pii pos) {
 	if (!wall) {
-		return false;
+		 return false;
 	}
 	return wall->getTileGIDAt(Vec2(pos.first, pos.second)) > 0;
 }
@@ -129,6 +129,10 @@ pii GameMap::get_next_position(pii now, int dir) {
 }
 
 bool GameMap::is_empty(pii pos, int delay, Snake *ignore) {
+	if (pos.first < 0 || pos.first >= max_game_width || pos.second < 0 || pos.second >= max_game_height) {
+		log("********************************************************************************************");
+		return false;
+	}
 	if (is_wall(pos)) {
 		return false;
 	}

@@ -60,7 +60,16 @@
     <string>饥饿值：</string>
     <key>broken</key>
     <string>碎了！</string>
-    
+    <key>complete</key>
+    <string>
+恭喜
+完成了所以目标
+</string>
+    <key>new_max_score</key>
+    <string>
+超越自我
+打破了上次的记录！
+</string>
     <key>eat green_apple</key>
     <string>
 吃了一个绿苹果

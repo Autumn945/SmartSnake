@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="4" height="4" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="wall_all" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../../psd/wall_all.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="2" name="tiles" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="tiles.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="18" name="wall_d" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../../psd/wall_d.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="19" name="wall_l_d" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../../psd/wall_l_d.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="20" name="wall_l" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../../psd/wall_l.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="21" name="wall_r" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../../psd/wall_r.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="22" name="wall_u" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../../psd/wall_u.png" width="32" height="32"/>
+ </tileset>
+ <layer name="块层 1" width="4" height="4">
+  <data encoding="csv">
+2,6,5,4,
+3,20,22,21,
+0,0,0,0,
+0,0,0,0
+</data>
+ </layer>
+</map>

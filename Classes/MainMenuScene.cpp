@@ -3,9 +3,11 @@
 #include "GameMenuScene.h"
 #include "OptionScene.h"
 #include "SimpleAudioEngine.h"
+//#include "MyGameScene.h"
 
 USING_NS_CC;
 //using namespace std;
+
 
 Scene* MainMenu::createScene() {
 	auto scene = Scene::create();
@@ -19,6 +21,14 @@ bool MainMenu::init() {
 		return false;
 	}
 	log("MainMenu init");
+	auto center = origin + visible_size / 2;
+	auto sp = Sprite::create("start.png");
+	CCASSERT(sp, "start.png has not found");
+	sp->setPosition(center);
+	this->addChild(sp);
+	game = MyGame::create(0);
+	this->addChild(game);
+	//scheduleUpdate();
 
 	if (user_info.count("control_mode") == 0) {
 		user_info["control_mode"] = 0;
@@ -35,7 +45,7 @@ bool MainMenu::init() {
 	FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	//(0.5, 1 - 0.618)
 	auto position = Vec2(origin.x + visible_size.width / 2
-		, origin.y + visible_size.height * (1 - 0.618));
+		, origin.y + visible_size.height * (1 - 0.85));
 
 	// scene turn to option function
 	auto create_menu_turn_to_option = [](string name) {
@@ -182,4 +192,8 @@ bool MainMenu::init() {
 		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("start.wav", true);
 	}
 	return true;
+}
+
+void MainMenu::update(float dt) {
+	game->update(dt);
 }

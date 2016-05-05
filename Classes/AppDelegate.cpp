@@ -36,9 +36,19 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	FileUtils::getInstance()->addSearchPath("res");
 	FileUtils::getInstance()->addSearchPath("music");
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("start.wav");
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("play.wav");
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("pang.wav");
+	auto simpleAudioEngine = CocosDenshion::SimpleAudioEngine::getInstance();
+	simpleAudioEngine->preloadBackgroundMusic("start.wav");
+	simpleAudioEngine->preloadBackgroundMusic("play.wav");
+	simpleAudioEngine->preloadEffect("button.wav");
+	simpleAudioEngine->preloadEffect("eat_heart.wav");
+	simpleAudioEngine->preloadEffect("eat_shit.wav");
+	simpleAudioEngine->preloadEffect("hunger.wav");
+	simpleAudioEngine->preloadEffect("lose.wav");
+	simpleAudioEngine->preloadEffect("pang.wav");
+	simpleAudioEngine->preloadEffect("turn.wav");
+	simpleAudioEngine->preloadEffect("win.wav");
+	simpleAudioEngine->preloadEffect("yaho.wav");
+	simpleAudioEngine->preloadEffect("eat.wav");
 
     // create a scene. it's an autorelease object
     auto scene = HelloWorld::createScene();

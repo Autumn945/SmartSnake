@@ -1,6 +1,7 @@
 #include "Snake.h"
 #include "SystemHeader.h"
 #include "MyGameScene.h"
+#include "SimpleAudioEngine.h"
 
 #define HEAD Rect(0, 0, UNIT, UNIT)
 #define BODY Rect(0, UNIT, UNIT, UNIT)
@@ -23,7 +24,13 @@ Snake* Snake::create(string name, GameMap* game_map) {
 
 bool Snake::init(string name, GameMap* game_map) {
 	log("snake init");
+	if (!SpriteBatchNode::init()) {
+		return false;
+	}
 	auto snake = game_map->getObjectGroup("snake_objs")->getObject(name);
+	if (snake.size() == 0) {
+		return false;
+	}
 	position = game_map->to_tile_map_pos(Vec2(snake["x"].asFloat(), snake["y"].asFloat()));
 	if (snake.count("direction") == 0) {
 		log("direction of snake has not define");
@@ -51,7 +58,7 @@ bool Snake::init(string name, GameMap* game_map) {
 		image = "snake_enemy.png";
 	}
 	else {
-		image = "snake3.png";
+		image = "snake_enemy.png";
 	}
 	if (!SpriteBatchNode::initWithFile(image)) {
 		return false;
@@ -116,7 +123,6 @@ bool Snake::go_ahead() {
 	new_head();
 	is_checked = false;
 	hunger += 1;
-	((MyGame*)game_map->getParent())->update_dir();
 	return true;
 }
 
@@ -247,12 +253,13 @@ void Snake::eat_reward(int gid) {
 	game->add_score(food_score[gid - 1]);
 	auto label = (Label*)game->getChildByName("label_score");
 	label->setString(get_UTF8_string("score") + Value(game->get_score()).asString()); auto food_gid = (MyGame::FOOD)gid;
+	auto str_audio = "eat.wav";
 	switch (food_gid) {
 	case MyGame::food_green_apple:
-		game->print_log("eat green_apple");
+		game->print_log(get_UTF8_string("eat green_apple"));
 		break;
 	case MyGame::food_red_apple:
-		game->print_log("eat red_apple");
+		game->print_log(get_UTF8_string("eat red_apple"));
 		break;
 	case MyGame::food_bird:
 	{
@@ -261,7 +268,7 @@ void Snake::eat_reward(int gid) {
 			game->add_max_hunger(-hunger);
 			hunger = 0;
 		}
-		game->print_log("eat bird");
+		game->print_log(get_UTF8_string("eat bird"));
 		break;
 	}
 	case MyGame::food_cola:
@@ -271,7 +278,7 @@ void Snake::eat_reward(int gid) {
 		}
 		auto label = (Label*)game->getChildByName("label_pause");
 		label->setString(" x" + Value(game->get_pause_n()).asString());
-		game->print_log("eat cola");
+		game->print_log(get_UTF8_string("eat cola"));
 		break;
 	}
 	case MyGame::food_bug:
@@ -286,7 +293,7 @@ void Snake::eat_reward(int gid) {
 				label->setString(" ok!");
 			}
 		}
-		game->print_log("eat bug");
+		game->print_log(get_UTF8_string("eat bug"));
 		break;
 	}
 	case MyGame::food_flower:
@@ -301,7 +308,7 @@ void Snake::eat_reward(int gid) {
 				label->setString(" ok!");
 			}
 		}
-		game->print_log("eat flower");
+		game->print_log(get_UTF8_string("eat flower"));
 		break;
 	}
 	case MyGame::food_heart:
@@ -309,17 +316,23 @@ void Snake::eat_reward(int gid) {
 		if (game->get_heart() < MyGame::max_heart) {
 			game->add_heart(1);
 		}
-		game->print_log("eat heart");
+		game->print_log(get_UTF8_string("eat heart"));
+		str_audio = "eat_heart.wav";
 		break;
 	}
 	case MyGame::food_shit:
 	{
 		game->add_heart(-1);
-		game->print_log("eat shit");
+		game->print_log(get_UTF8_string("eat shit"));
+		str_audio = "eat_shit.wav";
+		Device::vibrate(0.2f);
 		break;
 	}
 	default:
 		break;
+	}
+	if (user_info["soundEffects"].asInt() == 0) {
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(str_audio);
 	}
 }
 

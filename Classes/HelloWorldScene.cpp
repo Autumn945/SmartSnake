@@ -25,8 +25,8 @@ bool HelloWorld::init() {
 	}
 	// create background
 	auto center = origin + visible_size / 2;
-	auto sp = Sprite::create("HelloWorld.png");
-	CCASSERT(sp, "HelloWorld.png has not found");
+	auto sp = Sprite::create("start.png");
+	CCASSERT(sp, "start.png has not found");
 	sp->setPosition(center);
 	this->addChild(sp);
 

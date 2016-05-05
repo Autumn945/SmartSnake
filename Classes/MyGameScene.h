@@ -31,6 +31,7 @@ public:
 		, no_way
 		, win
 	};
+	bool has_player;
 	int remain_num[foods_num];
 	float cooldown[foods_num], current_cooldown[foods_num];
 	static const int max_heart = 5, max_pause_n = 5;
@@ -47,6 +48,8 @@ public:
 	void game_over(gameOverState state);
 	void print_log(string str);
 	void set_pause(bool pause);
+	void set_UI();
+	void set_Ctrl();
 	bool isUpdate;
 	int bug, flower, kill;
 	Sprite *turn_1, *turn_2;
