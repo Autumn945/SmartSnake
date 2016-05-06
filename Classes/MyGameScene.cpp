@@ -84,19 +84,17 @@ bool MyGame::init(int mission_id) {
 		auto snake_name = snake_vm["name"].asString();
 		if (snake_name != "player") {
 			auto snake_type = snake_vm["type"].asString();
-			if (snake_type == "player") {
-				snakes.push_back(Snake::create(snake_name, game_map));
+			auto snake = SmartSnake::create(snake_name, game_map);
+			if (snake_type == "friend") {
+				snake->type = Snake::SnakeType::t_friend;
 			}
 			else {
-				auto snake = SmartSnake::create(snake_name, game_map);
-				if (snake_type == "follow") {
-					snake->type = Snake::SnakeType::t_follow;
-				}
-				else {
-					snake->type = Snake::SnakeType::t_enemy;
-				}
-				snakes.push_back(snake);
+				snake->type = Snake::SnakeType::t_enemy;
 			}
+			if (has_player) {
+				snake->setUserObject(snakes[0]);
+			}
+			snakes.push_back(snake);
 		}
 	}
 	if (has_player) {
@@ -139,6 +137,7 @@ void MyGame::update(float dt) {
 		}
 		if (!can_go && get_heart() > 0) {
 			add_heart(-1);
+			snakes[0]->turn_1 = snakes[0]->turn_2 = -1;
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pang.wav");
 			auto label_heart = (Label*)this->getChildByName("label_heart");
 			label_heart->setString(" x" + Value(this->get_heart()).asString());
@@ -150,7 +149,7 @@ void MyGame::update(float dt) {
 			sprite_ban->runAction(action);
 			//snakes[0]->turn_1 = snakes[0]->turn_2 = -1;
 			set_pause(true);
-			//update_dir();
+			update_dir();
 			return;
 		}
 	}
@@ -200,12 +199,15 @@ void MyGame::update(float dt) {
 	if (has_player && !snakes[0]->get_is_died() && player_go) {
 		update_dir();
 		auto label_hunger = (Label*)this->getChildByName("label_hunger");
-		label_hunger->setString(get_UTF8_string("hunger") + Value(snakes[0]->get_hunger()).asString() + "/" + Value(max_hunger).asString());
-		bool hungry = false;
+		label_hunger->setString(get_UTF8_string("hunger")
+			+ Value(snakes[0]->get_hunger()).asString() + "/" + Value(max_hunger).asString());
 		if (snakes[0]->get_hunger() >= max_hunger) {
 			snakes[0]->add_hunger(-20);
 			this->add_heart(-1);
-			hungry = true;
+			if (this->get_heart() == -1) {
+				this->add_heart(-1);
+			}
+			Device::vibrate(0.2f);
 			if (user_info["soundEffects"].asInt() == 0) {
 				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("hunger.wav");
 			}
@@ -213,7 +215,10 @@ void MyGame::update(float dt) {
 		auto label_heart = (Label*)this->getChildByName("label_heart");
 		label_heart->setString(" x" + Value(this->get_heart()).asString());
 		if (this->get_heart() < 0) {
-			if (hungry) {
+			if (this->get_heart() == -3) {
+				game_over(gameOverState::friend_die);
+			}
+			else if (this->get_heart() == -2) {
 				game_over(gameOverState::hungry);
 			}
 			else {
@@ -261,8 +266,6 @@ void MyGame::game_over(gameOverState state) {
 	menu_clear_dir->setVisible(false);
 	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_key);
 	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_touch);
-	auto label_pause = (Label*)this->getChildByName("label_pause");
-	label_pause->setVisible(false);
 	if (state == win) {
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("win.wav");
@@ -334,6 +337,9 @@ void MyGame::game_over(gameOverState state) {
 		case MyGame::no_way:
 			str = "no way";
 			break;
+		case MyGame::friend_die:
+			str = "friend die";
+			break;
 		case MyGame::win:
 			break;
 		default:
@@ -361,21 +367,21 @@ void MyGame::print_log(string str) {
 }
 
 void MyGame::set_pause(bool pause) {
+	if (!pause) {
+		sprite_ban->stopAllActions();
+		sprite_ban->setVisible(false);
+	}
 	if (!(isUpdate ^ pause)) {
 		if (pause) {
-			auto label = (Label*)this->getChildByName("label_pause");
-			label->setVisible(false);
 			this->unscheduleUpdate();
 		}
 		else {
-			auto label = (Label*)this->getChildByName("label_pause");
-			label->setVisible(true);
 			game_map->setVisible(true);
 			this->scheduleUpdate();
 		}
 		menu_back->setVisible(isUpdate);
 		menu_again->setVisible(isUpdate);
-		menu_pause->setSelectedIndex(isUpdate);
+		menu_pause->setVisible(!isUpdate);
 		isUpdate = !isUpdate;
 	}
 }
@@ -533,30 +539,22 @@ void MyGame::set_Ctrl() {
 	menu_again->setPosition(x, origin.y);
 	auto font_size = MenuItemFont::getFontSize();
 	MenuItemFont::setFontSize(BIG_LABEL_FONT_SIZE + 10);
-	menu_pause = MenuItemToggle::createWithCallback([this](Ref *ref) {
+
+	menu_pause = MenuItemFont::create(get_UTF8_string("pause"), [this](Ref *ref) {
+		auto sender = (MenuItemFont*)ref;
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 		}
-		if (isUpdate) {
-			if (pause_n <= 0) {
-				game_map->setVisible(false);
-			}
-			else {
-				add_pause_n(-1);
-				auto label = (Label*)this->getChildByName("label_pause");
-				label->setString(" x" + Value(this->get_pause_n()).asString());
-			}
+		if (pause_n <= 0) {
+			game_map->setVisible(false);
 		}
 		else {
-			sprite_ban->stopAllActions();
-			sprite_ban->setVisible(false);
+			add_pause_n(-1);
+			auto label = (Label*)sender->getChildByName("label_pause");
+			label->setString(" x" + Value(this->get_pause_n()).asString());
 		}
 		set_pause(isUpdate);
-	},
-		MenuItemFont::create(get_UTF8_string("pause")),
-		MenuItemFont::create(get_UTF8_string("go on")),
-		NULL
-		);
+	});
 	MenuItemFont::setFontSize(font_size);
 	menu_pause->setVisible(true);
 	menu_again->setVisible(false);
@@ -566,8 +564,8 @@ void MyGame::set_Ctrl() {
 	auto label_pause = Label::createWithSystemFont(" x" + Value(pause_n).asString(), "abc", SMALL_LABEL_FONT_SIZE);
 	label_pause->setName("label_pause");
 	label_pause->setAnchorPoint(Vec2(0, 0));
-	label_pause->setPosition(menu_pause->getPosition() + Vec2(menu_pause->getContentSize().width, 0));
-	this->addChild(label_pause);
+	label_pause->setPosition(Vec2(menu_pause->getContentSize().width, 0));
+	menu_pause->addChild(label_pause);
 	turn_1 = Sprite::create("arrow.png");
 	turn_2 = Sprite::create("arrow.png");
 	turn_1->setPosition(menu_pause->getPosition() + Vec2(0, menu_pause->getContentSize().height + 10) + turn_1->getContentSize() / 2);
@@ -628,10 +626,13 @@ void MyGame::set_Ctrl() {
 				if (v.isZero()) {
 					v = t->getLocation() - (origin + visible_size / 2);
 					DIRECTION dir = set_dir(v);
-					for (auto snake : snakes) {
-						auto snake_type = snake->get_type();
-						if (snake_type == Snake::SnakeType::t_player || snake_type == Snake::SnakeType::t_follow) {
-							snake->turn(dir);
+					if (has_player) {
+						if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir))) {
+							snakes[0]->turn(dir);
+							set_pause(false);
+						}
+						if (isUpdate) {
+							snakes[0]->turn(dir);
 						}
 					}
 					update_dir();
@@ -651,10 +652,13 @@ void MyGame::set_Ctrl() {
 			}
 			if (fabs(pos.x - touch_begin->x) > touch_move_len || fabs(pos.y - touch_begin->y) > touch_move_len) {
 				DIRECTION dir = set_dir(pos - *touch_begin);
-				for (auto snake : snakes) {
-					auto snake_type = snake->get_type();
-					if (snake_type == Snake::SnakeType::t_player || snake_type == Snake::SnakeType::t_follow) {
-						snake->turn(dir);
+				if (has_player) {
+					if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir))) {
+						snakes[0]->turn(dir);
+						set_pause(false);
+					}
+					if (isUpdate) {
+						snakes[0]->turn(dir);
 					}
 				}
 				update_dir();
@@ -689,10 +693,13 @@ void MyGame::set_Ctrl() {
 		default:
 			return;
 		}
-		for (auto snake : snakes) {
-			auto snake_type = snake->get_type();
-			if (snake_type == Snake::SnakeType::t_player || snake_type == Snake::SnakeType::t_follow) {
-				snake->turn(dir);
+		if (has_player) {
+			if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir))) {
+				snakes[0]->turn(dir);
+				set_pause(false);
+			}
+			if (isUpdate) {
+				snakes[0]->turn(dir);
 			}
 		}
 		update_dir();

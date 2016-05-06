@@ -2,7 +2,7 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="24" height="22" tilewidth="32" tileheight="32" nextobjectid="27">
  <properties>
   <property name="bug" value="4"/>
-  <property name="flower" value="6"/>
+  <property name="flower" value="3"/>
   <property name="kill" value="0"/>
   <property name="score" value="1000,2000,3000"/>
  </properties>
@@ -1663,7 +1663,7 @@
     <property name="speed" value="30"/>
    </properties>
   </object>
-  <object id="26" name="enemy" type="enemy" x="112" y="464">
+  <object id="26" name="friend" type="friend" x="112" y="432">
    <properties>
     <property name="direction" value="1"/>
     <property name="speed" value="30"/>

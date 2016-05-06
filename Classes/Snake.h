@@ -10,7 +10,7 @@ class Snake : public SpriteBatchNode{
 public:
 	enum SnakeType {
 		t_player
-		, t_follow
+		, t_friend
 		, t_enemy
 	};
 	static const int step_length = 500;

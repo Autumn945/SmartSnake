@@ -29,6 +29,7 @@ public:
 		, impact_wall
 		, impact_snake
 		, no_way
+		, friend_die
 		, win
 	};
 	bool has_player;
@@ -53,8 +54,7 @@ public:
 	bool isUpdate;
 	int bug, flower, kill;
 	Sprite *turn_1, *turn_2;
-	MenuItemFont *menu_clear_dir, *menu_back, *menu_again;
-	MenuItemToggle *menu_pause;
+	MenuItemFont *menu_clear_dir, *menu_back, *menu_again, *menu_pause;
 	Menu* menu;
 	EventListenerKeyboard *listener_key;
 	EventListenerTouchOneByOne *listener_touch;

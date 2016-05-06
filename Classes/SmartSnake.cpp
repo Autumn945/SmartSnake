@@ -30,15 +30,25 @@ void SmartSnake::eat_reward(int gid) {
 bool SmartSnake::go_die() {
 	is_died = true; 
 	auto game = (MyGame*)game_map->getParent();
-	game->kill--;
-	auto label = (Label*)game->getChildByName("label_kill");
-	if (label) {
-		if (game->kill > 0) {
-			label->setString(" x" + Value(game->kill).asString());
+	if (get_type() == Snake::SnakeType::t_enemy) {
+		game->kill--;
+		auto label = (Label*)game->getChildByName("label_kill");
+		if (label) {
+			if (game->kill > 0) {
+				label->setString(" x" + Value(game->kill).asString());
+			}
+			else {
+				label->setString(" ok!");
+			}
 		}
-		else {
-			label->setString(" ok!");
+	}
+	else {
+		Device::vibrate(0.4f);
+		game->add_heart(-max(1, game->get_heart()));
+		if (game->get_heart() == -1) {
+			game->add_heart(-2);
 		}
+		game->print_log(get_UTF8_string("a friend is died"));
 	}
 	return true;
 	game_map->add_empty_n(snake_nodes->size());
@@ -49,21 +59,27 @@ bool SmartSnake::go_die() {
 }
 
 bool SmartSnake::go_ahead() {
-	if (!is_died && type == Snake::SnakeType::t_enemy) {
-		act();
+	if (get_is_died()) {
+		return false;
 	}
-	if (turn_1 < 0 || !game_map->is_empty(game_map->get_next_position(position, turn_1))) {
-		vector<int> dir_v;
-		for (int i = 0; i < 4; i++) {
-			if (abs(i - current_dir) != 2 && game_map->is_empty(game_map->get_next_position(position, i))) {
-				dir_v.push_back(i);
+	if (type == Snake::SnakeType::t_enemy) {
+		act();
+		if (turn_1 < 0 || !game_map->is_empty(game_map->get_next_position(position, turn_1))) {
+			vector<int> dir_v;
+			for (int i = 0; i < 4; i++) {
+				if (abs(i - current_dir) != 2 && game_map->is_empty(game_map->get_next_position(position, i))) {
+					dir_v.push_back(i);
+				}
+			}
+			if (dir_v.size() > 0) {
+				turn_1 = dir_v[random(0, (int)dir_v.size() - 1)];
 			}
 		}
-		if (dir_v.size() > 0) {
-			turn_1 = dir_v[random(0, (int)dir_v.size() - 1)];
-		}
+		log("ture dir = %d", turn_1);
 	}
-	log("ture dir = %d", turn_1);
+	else {
+		turn_1 = ((Snake*)getUserObject())->get_current_dir();
+	}
 	if (!Snake::go_ahead()) {
 		return false;
 	}

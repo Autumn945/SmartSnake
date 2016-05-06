@@ -51,8 +51,8 @@ bool Snake::init(string name, GameMap* game_map) {
 	if (snake_type == "player") {
 		image = "snake_player.png";
 	}
-	else if (snake_type == "follow") {
-		image = "snake_follow.png";
+	else if (snake_type == "friend") {
+		image = "snake_friend.png";
 	}
 	else if (snake_type == "enemy") {
 		image = "snake_enemy.png";
@@ -276,7 +276,7 @@ void Snake::eat_reward(int gid) {
 		if (game->get_pause_n() < MyGame::max_pause_n) {
 			game->add_pause_n(1);
 		}
-		auto label = (Label*)game->getChildByName("label_pause");
+		auto label = (Label*)game->menu_pause->getChildByName("label_pause");
 		label->setString(" x" + Value(game->get_pause_n()).asString());
 		game->print_log(get_UTF8_string("eat cola"));
 		break;

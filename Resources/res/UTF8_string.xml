@@ -60,6 +60,13 @@
     <string>饥饿值：</string>
     <key>broken</key>
     <string>碎了！</string>
+
+
+    <key>a friend is died</key>
+    <string>
+朋友撞了
+好伤心
+    </string>
     <key>complete</key>
     <string>
 恭喜
@@ -135,11 +142,17 @@
 饿得太久了
 心都碎了
 </string>
+    <key>friend die</key>
+    <string>
+朋友撞了
+伤心死了
+    </string>
     <key>i do not know</key>
     <string>
 不知不觉
 不明不白
-就这样挂了</string>
+就这样挂了
+</string>
 
     
     <!--default string-->
