@@ -52,7 +52,7 @@ public:
 	void set_UI();
 	void set_Ctrl();
 	bool isUpdate;
-	int bug, flower, kill;
+	int apple, bug, flower, kill;
 	Sprite *turn_1, *turn_2;
 	MenuItemFont *menu_clear_dir, *menu_back, *menu_again, *menu_pause;
 	Menu* menu;

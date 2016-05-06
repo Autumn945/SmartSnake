@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="14" tilewidth="32" tileheight="32" nextobjectid="27">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="14" tilewidth="32" tileheight="32" nextobjectid="28">
  <properties>
-  <property name="bug" value="0"/>
-  <property name="flower" value="0"/>
-  <property name="kill" value="1"/>
+  <property name="apple" value="3"/>
+  <property name="bug" value="3"/>
+  <property name="flower" value="3"/>
+  <property name="kill" value="0"/>
   <property name="score" value="10000,20000,30000"/>
  </properties>
  <tileset firstgid="1" name="foods" tilewidth="32" tileheight="32" tilecount="16" columns="4">
@@ -11,7 +12,7 @@
   <tile id="0">
    <properties>
     <property name="cooldown" value="3"/>
-    <property name="max_num" value="-1"/>
+    <property name="max_num" value="1"/>
    </properties>
   </tile>
   <tile id="1">
@@ -46,8 +47,8 @@
   </tile>
   <tile id="6">
    <properties>
-    <property name="cooldown" value="10"/>
-    <property name="max_num" value="-1"/>
+    <property name="cooldown" value="20"/>
+    <property name="max_num" value="1"/>
    </properties>
   </tile>
   <tile id="7">
@@ -913,21 +914,27 @@
   </data>
  </layer>
  <objectgroup name="snake_objs">
-  <object id="1" name="player" type="player" x="272" y="400">
+  <object id="1" name="player" type="player" x="48" y="208">
    <properties>
     <property name="direction" value="1"/>
     <property name="speed" value="30"/>
    </properties>
   </object>
-  <object id="22" name="friend1" type="friend" x="112" y="208">
+  <object id="22" name="friend1" type="friend" x="48" y="48">
    <properties>
-    <property name="direction" value="3"/>
+    <property name="direction" value="1"/>
     <property name="speed" value="30"/>
    </properties>
   </object>
-  <object id="26" name="friend2" type="friend" x="328" y="232">
+  <object id="26" name="friend2" type="friend" x="272" y="48">
    <properties>
-    <property name="direction" value="3"/>
+    <property name="direction" value="1"/>
+    <property name="speed" value="30"/>
+   </properties>
+  </object>
+  <object id="27" name="friend3" type="friend" x="272" y="208">
+   <properties>
+    <property name="direction" value="1"/>
     <property name="speed" value="30"/>
    </properties>
   </object>

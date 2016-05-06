@@ -64,7 +64,7 @@
 
     <key>a friend is died</key>
     <string>
-朋友撞了
+小青撞了
 好伤心
     </string>
     <key>complete</key>
@@ -101,12 +101,12 @@
     <key>eat bug</key>
     <string>
 吃了一条小虫子
-离目标又进一步了
+离目标又近一步了
 </string>
     <key>eat flower</key>
     <string>
 吃了一朵小花
-离目标又进一步了
+离目标又近一步了
 </string>
     <key>eat heart</key>
     <string>
@@ -144,7 +144,7 @@
 </string>
     <key>friend die</key>
     <string>
-朋友撞了
+小青撞了
 伤心死了
     </string>
     <key>i do not know</key>

@@ -52,9 +52,13 @@ bool MyGame::init(int mission_id) {
 	sprite_ban->setVisible(false);
 	this->addChild(sprite_ban, 100);
 	this->addChild(game_map);
+	auto apple_v = game_map->getProperty("apple");
 	auto bug_v = game_map->getProperty("bug");
 	auto flower_v = game_map->getProperty("flower");
 	auto kill_v = game_map->getProperty("kill");
+	if (apple_v.isNull()) {
+		apple_v = 0;
+	}
 	if (bug_v.isNull()) {
 		bug_v = 0;
 	}
@@ -64,6 +68,7 @@ bool MyGame::init(int mission_id) {
 	if (kill_v.isNull()) {
 		kill_v = 0;
 	}
+	apple = apple_v.asInt();
 	bug = bug_v.asInt();
 	flower = flower_v.asInt();
 	kill = kill_v.asInt();
@@ -273,7 +278,9 @@ void MyGame::game_over(gameOverState state) {
 		auto pre_score = user_info["mission_score" + id_string].asInt();
 		auto str = get_UTF8_string("complete");
 		add_score(get_heart() * 300);
-		add_score((get_max_hunger() - snakes[0]->get_hunger()) * 5);
+		add_score((get_max_hunger() - snakes[0]->get_hunger()) * 5); 
+		auto label_score = (Label*)getChildByName("label_score");
+		label_score->setString(get_UTF8_string("score") + Value(get_score()).asString());
 		if (get_score() > pre_score) {
 			user_info["mission_score" + id_string] = get_score();
 			if (pre_score > 0) {
@@ -286,7 +293,7 @@ void MyGame::game_over(gameOverState state) {
 		}
 		print_log(str);
 		user_info["mission_success" + id_string] = user_info["mission_success" + id_string].asInt() + 1;
-		user_info["current_mission"] = this->getTag() + 1;
+		user_info["current_mission"] = max(this->getTag() + 1, user_info["current_mission"].asInt());
 		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 
 		auto label = Label::createWithSystemFont(get_UTF8_string("win"), "abc", MID_LABEL_FONT_SIZE);
@@ -393,6 +400,18 @@ void MyGame::set_UI() {
 	label_goal->setPosition(0, y);
 	this->addChild(label_goal);
 	y -= label_goal->getContentSize().height + 20;
+	if (apple > 0) {
+		auto sprite = Sprite::create("apple.png");
+		sprite->setAnchorPoint(Vec2(0, 1));
+		sprite->setPosition(x, y);
+		auto label = Label::createWithSystemFont(" x" + Value(bug).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+		label->setAnchorPoint(Vec2(0, 1));
+		label->setPosition(x + sprite->getContentSize().width, y);
+		label->setName("label_apple");
+		y -= max(sprite->getContentSize().height, label->getContentSize().height) + 5;
+		this->addChild(sprite);
+		this->addChild(label);
+	}
 	if (kill > 0) {
 		auto sprite = Sprite::create("snake.png");
 		sprite->setAnchorPoint(Vec2(0, 1));

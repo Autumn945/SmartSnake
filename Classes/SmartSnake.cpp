@@ -28,7 +28,7 @@ void SmartSnake::eat_reward(int gid) {
 }
 
 bool SmartSnake::go_die() {
-	is_died = true; 
+	Snake::go_die();
 	auto game = (MyGame*)game_map->getParent();
 	if (get_type() == Snake::SnakeType::t_enemy) {
 		game->kill--;

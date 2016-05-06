@@ -92,6 +92,9 @@ void Snake::go_step() {
 	else if (speed > step_length / 2) {
 		speed = step_length / 2;
 	}
+	if (this->get_type() == SnakeType::t_friend) {
+		this->speed = ((Snake*)getUserObject())->get_speed();
+	}
 	if (step >= step_length) {
 		this->go_ahead();
 		add_time_stamp(1);
@@ -169,6 +172,11 @@ bool Snake::new_head() {
 			case 0:
 				rect = BODY;
 				break;
+			case 2:
+			case -2:
+				this->go_die();
+				return false;
+				break;
 			}
 		}
 		current_dir = next_dir;
@@ -207,9 +215,8 @@ bool Snake::check() {
 		return false;
 	}
 	is_checked = true;
-	auto wall = game_map->getLayer("wall");
 	auto game = (MyGame*)game_map->getParent();
-	if (wall != NULL && wall->getTileGIDAt(Vec2(position.first, position.second)) > 0) {
+	if (game_map->is_wall(position)) {
 		log("%s p wall", this->getName().c_str());
 		this->go_die();
 		if (this->get_type() == SnakeType::t_player) {
@@ -235,11 +242,10 @@ bool Snake::check() {
 		}
 		return true;
 	}
-	auto food = game_map->getLayer("food");
-	if (food != NULL && food->getTileGIDAt(Vec2(position.first, position.second)) > 0) {
-		auto gid = food->getTileGIDAt(Vec2(position.first, position.second));
+	auto gid = game_map->food_id(position);
+	if (gid > 0) {
 		this->eat(gid);
-		food->setTileGID(0, Vec2(position.first, position.second));
+		game_map->get_food()->setTileGID(0, Vec2(position.first, position.second));
 	}
 	return true;
 }
@@ -252,12 +258,25 @@ void Snake::eat_reward(int gid) {
 	auto game = (MyGame*)game_map->getParent();
 	game->add_score(food_score[gid - 1]);
 	auto label = (Label*)game->getChildByName("label_score");
-	label->setString(get_UTF8_string("score") + Value(game->get_score()).asString()); auto food_gid = (MyGame::FOOD)gid;
+	label->setString(get_UTF8_string("score") + Value(game->get_score()).asString()); 
+	auto food_gid = (MyGame::FOOD)gid;
 	auto str_audio = "eat.wav";
 	switch (food_gid) {
 	case MyGame::food_green_apple:
+	{
+		game->apple--;
+		auto label = (Label*)game->getChildByName("label_apple");
+		if (label) {
+			if (game->apple > 0) {
+				label->setString(" x" + Value(game->apple).asString());
+			}
+			else {
+				label->setString(" ok!");
+			}
+		}
 		game->print_log(get_UTF8_string("eat green_apple"));
 		break;
+	}
 	case MyGame::food_red_apple:
 		game->print_log(get_UTF8_string("eat red_apple"));
 		break;
@@ -397,6 +416,7 @@ bool Snake::turn(DIRECTION dir) {
 
 bool Snake::go_die() {
 	is_died = true;
+	snake_nodes->back()->setVisible(false);
 	return false;
 }
 

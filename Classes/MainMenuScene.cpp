@@ -29,19 +29,7 @@ bool MainMenu::init() {
 	game = MyGame::create(0);
 	this->addChild(game);
 	//scheduleUpdate();
-
-	if (user_info.count("control_mode") == 0) {
-		user_info["control_mode"] = 0;
-	}
-	if (user_info.count("soundEffects") == 0) {
-		user_info["soundEffects"] = 0;
-	}
-	if (user_info.count("music") == 0) {
-		user_info["music"] = 0;
-	}
-	if (user_info.count("current_mission") == 0) {
-		user_info["current_mission"] = 1;
-	}
+	user_info["current_mission"] = max(1, user_info["current_mission"].asInt());
 	FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	//(0.5, 1 - 0.618)
 	auto position = Vec2(origin.x + visible_size.width / 2
