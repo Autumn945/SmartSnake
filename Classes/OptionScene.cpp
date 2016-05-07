@@ -163,6 +163,9 @@ bool Option::init() {
 				break;
 			}
 			auto menu_help = MenuItemFont::create(UTF8str, [label_help](Ref *ref) {
+				if (user_info["soundEffects"].asInt() == 0) {
+					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+				}
 				auto sender = (Node*)ref;
 				label_help->setString(get_UTF8_string("text_help_" + Value(sender->getTag()).asString()));
 			});
