@@ -1666,6 +1666,7 @@
   <object id="22" name="smartsnake" type="enemy" x="720" y="656">
    <properties>
     <property name="direction" value="3"/>
+    <property name="hated_food" value="0"/>
     <property name="speed" value="50"/>
    </properties>
   </object>

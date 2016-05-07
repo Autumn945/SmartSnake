@@ -50,7 +50,7 @@ bool Option::init() {
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu);
 	//create top label
-	auto top_label = Label::createWithSystemFont(get_UTF8_string(this->getName()), "Arial", BIG_LABEL_FONT_SIZE);
+	auto top_label = Label::createWithSystemFont(get_UTF8_string(this->getName()), "abc", BIG_LABEL_FONT_SIZE);
 	top_label->setAnchorPoint(Vec2(0.5, 1));
 	top_label->setPosition(origin.x + visible_size.width / 2
 		, origin.y + visible_size.height); 
@@ -151,8 +151,37 @@ bool Option::init() {
 		return true;
 	}
 	if (this->getName() == "help") {
+		float x = 10, y = origin.x + visible_size.height - top_label->getContentSize().height * 1.5f;
+		auto label_help = Label::createWithSystemFont(get_UTF8_string("text_help_0"), "abc", SMALL_LABEL_FONT_SIZE);
+		label_help->setAnchorPoint(Vec2(0, 1));
+		label_help->setPosition(x, y);
+		this->addChild(label_help);
+		for (int i = 0; i < 100; i++) {
+			string str = "menu_help_" + Value(i).asString();
+			auto UTF8str = get_UTF8_string(str);
+			if (str == UTF8str) {
+				break;
+			}
+			auto menu_help = MenuItemFont::create(UTF8str, [label_help](Ref *ref) {
+				auto sender = (Node*)ref;
+				label_help->setString(get_UTF8_string("text_help_" + Value(sender->getTag()).asString()));
+			});
+			menu_help->setAnchorPoint(Vec2(0, 1));
+			menu_help->setPosition(x, y);
+			menu_help->setTag(i);
+			menu->addChild(menu_help);
+			y -= menu_help->getContentSize().height + 10;
+			label_help->setPositionX(max(label_help->getPositionX(), x + menu_help->getContentSize().width * 1.0f));
+		}
+		label_help->setDimensions(visible_size.width - 1.5f * label_help->getPositionX(), visible_size.height);
+		//label_help->setMaxLineWidth(visible_size.width - 2 * label_help->getPositionX());
+		//label_help->setLineBreakWithoutSpace(false);
 		return true;
 	}
+	auto label_option = Label::createWithSystemFont(get_UTF8_string("text_" + this->getName()), "abc", SMALL_LABEL_FONT_SIZE);
+	label_option->setPosition(origin + visible_size / 2);
+	label_option->setDimensions(visible_size.width / 2, visible_size.height / 2);
+	this->addChild(label_option);
 	if (this->getName() == "about") {
 		return true;
 	}

@@ -32,10 +32,7 @@ bool Snake::init(string name, GameMap* game_map) {
 		return false;
 	}
 	position = game_map->to_tile_map_pos(Vec2(snake["x"].asFloat(), snake["y"].asFloat()));
-	if (snake.count("direction") == 0) {
-		log("direction of snake has not define");
-		snake["direction"] = Value(DIRECTION::UP);
-	}
+	this->setTag(snake["hated_food"].asInt());
 	if (snake.count("length") == 0) {
 		log("length of snake has not define");
 		snake["length"] = 3;

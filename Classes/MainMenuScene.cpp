@@ -67,6 +67,7 @@ bool MainMenu::init() {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 		}
 		Director::getInstance()->end();
+		CocosDenshion::SimpleAudioEngine::getInstance()->end();
 	});
 
 	//add into a vector

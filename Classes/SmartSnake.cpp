@@ -284,7 +284,8 @@ int SmartSnake::get_target_shortest_path_dir(pii position, int current_dir, int 
 				}
 				vis[nxt.first][nxt.second] = c_dir;
 				pre_position[nxt.first][nxt.second] = now;
-				if (game_map->food_id(nxt) > 0) {
+				auto food_id = game_map->food_id(nxt);
+				if (food_id > 0 && (this->getTag() & (1 << (food_id - 1))) == 0) {
 					pii target = nxt;
 					log("target = (%d, %d)", target.first, target.second);
 					vector<pii> vt;

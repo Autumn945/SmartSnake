@@ -6,7 +6,7 @@
         <key>mission_score0</key>
         <integer>0</integer>
         <key>current_mission</key>
-        <integer>3</integer>
+        <integer>4</integer>
         <key>mission_success0</key>
         <integer>0</integer>
         <key>mission_challenge0</key>
@@ -30,22 +30,24 @@
         <key>mission_success2</key>
         <integer>1</integer>
         <key>mission_challenge2</key>
-        <integer>1</integer>
+        <integer>6</integer>
         <key>mission_score3</key>
-        <integer>0</integer>
+        <integer>5350</integer>
         <key>mission_success3</key>
-        <integer>0</integer>
-        <key>mission_challenge3</key>
         <integer>1</integer>
+        <key>mission_challenge3</key>
+        <integer>4</integer>
         <key>mission_score4</key>
         <integer>0</integer>
         <key>mission_success4</key>
         <integer>0</integer>
         <key>mission_challenge4</key>
-        <integer>0</integer>
+        <integer>1</integer>
         <key>mission_score5</key>
         <integer>0</integer>
         <key>mission_success5</key>
+        <integer>0</integer>
+        <key>clear</key>
         <integer>0</integer>
         <key>mission_challenge5</key>
         <integer>0</integer>
