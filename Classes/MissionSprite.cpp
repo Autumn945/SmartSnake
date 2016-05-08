@@ -58,8 +58,8 @@ bool Mission::init(int id) {
 	challenge = user_info["mission_challenge" + id_string].asInt();
 	auto center = (Vec2)this->getContentSize() / 2;
 	float y = this->getContentSize().height - 10;
-	auto name = Label::createWithSystemFont(String::createWithFormat(get_UTF8_string("mission_id").c_str(), id)->getCString()
-		, "abc", SMALL_LABEL_FONT_SIZE);
+	auto name = Label::createWithTTF(String::createWithFormat(get_UTF8_string("mission_id").c_str(), id)->getCString()
+		, "font.ttf", SMALL_LABEL_FONT_SIZE);
 	name->setPosition(center.x, y);
 	name->setAnchorPoint(Vec2(0.5, 1));
 	this->addChild(name);
@@ -85,14 +85,14 @@ bool Mission::init(int id) {
 		this->addChild(sp);
 	}
 	y -= sp_f->getContentSize().height;
-	auto max_score = Label::createWithSystemFont(get_UTF8_string("max_score") + Value(score).asString()
-		, "abc", SMALL_LABEL_FONT_SIZE);
+	auto max_score = Label::createWithTTF(get_UTF8_string("max_score") + Value(score).asString()
+		, "font.ttf", SMALL_LABEL_FONT_SIZE);
 	max_score->setPosition(center.x, y);
 	max_score->setAnchorPoint(Vec2(0.5, 1));
 	this->addChild(max_score);
 	y -= max_score->getContentSize().height;
-	auto rate = Label::createWithSystemFont(get_UTF8_string("success/challenge") + String::createWithFormat("%d/%d", success, challenge)->getCString()
-		, "abc", SMALL_LABEL_FONT_SIZE - 10);
+	auto rate = Label::createWithTTF(get_UTF8_string("success/challenge") + String::createWithFormat("%d/%d", success, challenge)->getCString()
+		, "font.ttf", SMALL_LABEL_FONT_SIZE - 10);
 	rate->setPosition(center.x, y);
 	rate->setAnchorPoint(Vec2(0.5, 1));
 	this->addChild(rate);

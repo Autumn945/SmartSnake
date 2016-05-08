@@ -50,7 +50,7 @@ bool Option::init() {
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu);
 	//create top label
-	auto top_label = Label::createWithSystemFont(get_UTF8_string(this->getName()), "abc", BIG_LABEL_FONT_SIZE);
+	auto top_label = Label::createWithTTF(get_UTF8_string(this->getName()), "font.ttf", BIG_LABEL_FONT_SIZE);
 	top_label->setAnchorPoint(Vec2(0.5, 1));
 	top_label->setPosition(origin.x + visible_size.width / 2
 		, origin.y + visible_size.height); 
@@ -60,7 +60,7 @@ bool Option::init() {
 		Vec2 pos_left = origin + Vec2(visible_size.width * 0.5, visible_size.height * 0.6);
 		float right = origin.x + visible_size.width * 0.6;
 		//music
-		auto music = Label::createWithSystemFont(get_UTF8_string("music"), "Arial", MID_LABEL_FONT_SIZE);
+		auto music = Label::createWithTTF(get_UTF8_string("music"), "font.ttf", MID_LABEL_FONT_SIZE);
 		music->setAnchorPoint(Vec2(1, 0));
 		music->setPosition(pos_left);
 		this->addChild(music);
@@ -88,7 +88,7 @@ bool Option::init() {
 		menu->addChild(menu_music);
 		pos_left.y -= music->getContentSize().height;
 		//soundEffects
-		auto soundEffects = Label::createWithSystemFont(get_UTF8_string("soundEffects"), "Arial", MID_LABEL_FONT_SIZE);
+		auto soundEffects = Label::createWithTTF(get_UTF8_string("soundEffects"), "font.ttf", MID_LABEL_FONT_SIZE);
 		soundEffects->setAnchorPoint(Vec2(1, 0));
 		soundEffects->setPosition(pos_left);
 		this->addChild(soundEffects);
@@ -110,7 +110,7 @@ bool Option::init() {
 		menu->addChild(menu_soundEffects);
 		pos_left.y -= soundEffects->getContentSize().height;
 		//control_mode
-		auto control_mode = Label::createWithSystemFont(get_UTF8_string("controlModes"), "Arial", MID_LABEL_FONT_SIZE);
+		auto control_mode = Label::createWithTTF(get_UTF8_string("controlModes"), "font.ttf", MID_LABEL_FONT_SIZE);
 		control_mode->setAnchorPoint(Vec2(1, 0));
 		control_mode->setPosition(pos_left);
 		this->addChild(control_mode);
@@ -152,7 +152,7 @@ bool Option::init() {
 	}
 	if (this->getName() == "help") {
 		float x = 10, y = origin.x + visible_size.height - top_label->getContentSize().height * 1.5f;
-		auto label_help = Label::createWithSystemFont(get_UTF8_string("text_help_0"), "abc", SMALL_LABEL_FONT_SIZE);
+		auto label_help = Label::createWithTTF(get_UTF8_string("text_help_0"), "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label_help->setAnchorPoint(Vec2(0, 1));
 		label_help->setPosition(x, y);
 		this->addChild(label_help);
@@ -162,12 +162,39 @@ bool Option::init() {
 			if (str == UTF8str) {
 				break;
 			}
-			auto menu_help = MenuItemFont::create(UTF8str, [label_help](Ref *ref) {
+			auto menu_help = MenuItemFont::create(UTF8str, [this, label_help](Ref *ref) {
 				if (user_info["soundEffects"].asInt() == 0) {
 					CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 				}
 				auto sender = (Node*)ref;
-				label_help->setString(get_UTF8_string("text_help_" + Value(sender->getTag()).asString()));
+				auto text = get_UTF8_string("text_help_" + Value(sender->getTag()).asString());
+				label_help->setString(text);
+				label_help->updateContent();
+				if (sender->getTag() == 5) {
+					for (int i = 0; i < foods_num; i++) {
+						auto id = text.find(get_UTF8_string("food_name" + Value(i).asString()));
+						auto length = text.length();
+						auto sp = Sprite::create("foods.png", Rect(i % 4 * UNIT, i / 4 * UNIT, UNIT, UNIT));
+						for (int j = 0, max_j = min(id, length); j < max_j; j++) {
+							if (text.at(j) < 0) {
+								j += 2;
+								id -= 2;
+							}
+						}
+						auto sp_t = label_help->getLetter(id);
+						if (!sp_t) {
+							continue;
+						}
+						sp->setPosition(sp_t->getPosition() + Vec2(-UNIT, 0));
+						label_help->addChild(sp);
+						//sp_t->setSpriteFrame(sp->getSpriteFrame());
+						//sp_t->setPosition(sp_t->getPosition() + Vec2(20, 20));
+						//sp_t->setColor(Color3B::RED);
+					}
+				}
+				else {
+					label_help->removeAllChildren();
+				}
 			});
 			menu_help->setAnchorPoint(Vec2(0, 1));
 			menu_help->setPosition(x, y);
@@ -181,7 +208,7 @@ bool Option::init() {
 		//label_help->setLineBreakWithoutSpace(false);
 		return true;
 	}
-	auto label_option = Label::createWithSystemFont(get_UTF8_string("text_" + this->getName()), "abc", SMALL_LABEL_FONT_SIZE);
+	auto label_option = Label::createWithTTF(get_UTF8_string("text_" + this->getName()), "font.ttf", SMALL_LABEL_FONT_SIZE);
 	label_option->setPosition(origin + visible_size / 2);
 	label_option->setDimensions(visible_size.width / 2, visible_size.height / 2);
 	this->addChild(label_option);

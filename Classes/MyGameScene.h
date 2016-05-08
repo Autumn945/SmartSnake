@@ -35,7 +35,7 @@ public:
 	bool has_player;
 	int remain_num[foods_num];
 	float cooldown[foods_num], current_cooldown[foods_num];
-	static const int max_heart = 5, max_pause_n = 5;
+	static const int max_heart = 5, max_pause_n = 2;
 	DEFINE_VAR_GET_ADD(int, score);
 	DEFINE_VAR_GET_ADD(int, heart);
 	DEFINE_VAR_GET_ADD(int, max_hunger);

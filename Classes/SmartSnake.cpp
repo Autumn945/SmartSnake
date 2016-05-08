@@ -24,6 +24,9 @@ bool SmartSnake::init(string name, GameMap* game_map) {
 }
 
 void SmartSnake::eat_reward(int gid) {
+	if (this->get_type() == Snake::SnakeType::t_friend && random(0, 1)) {
+		Snake::eat_reward(gid);
+	}
 	hunger = 0;
 }
 
@@ -177,83 +180,6 @@ int SmartSnake::get_accessible_last_snake_node_dir(pii position, int dir, int &s
 	} while (next_permutation(dir_f, dir_f + 4));
 	start_step = ret.first;
 	return ret.second;
-	
-	//int dir_f[4] = { 0, 1, 2, 3 };
-	//int ret = -1;
-	//int max_length = -0x3fffff;
-	//auto snake_map = game_map->get_snake_map();
-	//pii target = pii(-1, -1);
-	////for (int dir_t = 0; dir_t < 8; dir_t++) {
-	//do {
-	//	int step_on[max_game_width][max_game_height];
-	//	memset(step_on, -1, sizeof(step_on));
-	//	struct TempData {
-	//		pii pos;
-	//		int step, dir, first_dir;
-	//		TempData(pii _pos, int _step, int _dir, int _first_dir): pos(_pos), step(_step), dir(_dir), first_dir(_first_dir) {}
-	//	};
-	//	stack<TempData> q;
-	//	q.push(TempData(position, start_step, dir, -1));
-	//	int max_step = -1;
-	//	while (!q.empty()) {
-	//		auto now = q.top().pos;
-	//		auto step = q.top().step;
-	//		auto dir = q.top().dir;
-	//		auto first_dir = q.top().first_dir;
-	//		q.pop();
-	//		if (pre_step_on[now.first][now.second] >= 0) {
-	//			step_on[now.first][now.second] = pre_step_on[now.first][now.second];
-	//		}
-	//		if (step_on[now.first][now.second] >= 0) {
-	//			int length = step - step_on[now.first][now.second] - get_length();
-	//			if (length > max_length) {
-	//				max_length = length;
-	//				target = now;
-	//				ret = first_dir;
-	//			}
-	//			continue;
-	//		}
-	//		step_on[now.first][now.second] = step;
-	//		//log("now = (%d, %d)", now.first, now.second);
-	//		auto sp = snake_map[now.first][now.second];
-	//		if (sp && sp->getParent() == this && now != position) {
-	//			int length = step - (sp->getTag() - this->get_tail_time_stamp() + 1);
-	//			//log("find, step = %d, length = %d", step - start_step, lenght_step);
-	//			if (length > max_length) {
-	//				max_length = length;
-	//				target = now;
-	//				ret = first_dir;
-	//			}
-	//			if (length < 0) {
-	//				continue;
-	//			}
-	//		}
-	//		auto steps = (step + 1) * Snake::step_length - this->get_step();
-	//		auto time_snake = (steps - 1) / this->get_speed() + 1;
-	//		if (steps <= 0) {
-	//			time_snake = 0;
-	//		}
-	//		for (int i = 0; i < 4; i++) {
-	//			/*int c_dir = (dir_t / 2 + i) & 3;
-	//			if (dir_t & 1) {
-	//				c_dir = (dir_t / 2 - i) & 3;
-	//			}
-	//			if (abs(dir - c_dir) == 2) {
-	//				continue;
-	//			}*/
-	//			int c_dir = dir_f[i];
-	//			auto nxt = game_map->get_next_position(now, c_dir);
-	//			if (game_map->is_empty(nxt, time_snake, this)) {
-	//				if (now == position) {
-	//					first_dir = c_dir;
-	//				}
-	//				q.push(TempData(nxt, step + 1, c_dir, first_dir));
-	//			}
-	//		}
-	//	}
-	//} while (next_permutation(dir_f, dir_f + 4));
-	//start_step = max_length;
-	//return ret;
 }
 
 int SmartSnake::get_target_shortest_path_dir(pii position, int current_dir, int & max_length) {

@@ -43,7 +43,7 @@ bool MyGame::init(int mission_id) {
 	}
 	score = 0;
 	heart = 3;
-	pause_n = 3;
+	pause_n = 1;
 	max_hunger = 50;
 	this->setTag(mission_id);
 	game_map = mission->get_game_map();
@@ -296,7 +296,7 @@ void MyGame::game_over(gameOverState state) {
 		user_info["current_mission"] = max(this->getTag() + 1, user_info["current_mission"].asInt());
 		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 
-		auto label = Label::createWithSystemFont(get_UTF8_string("win"), "abc", MID_LABEL_FONT_SIZE);
+		auto label = Label::createWithTTF(get_UTF8_string("win"), "font.ttf", MID_LABEL_FONT_SIZE);
 		label->setColor(Color3B::RED);
 		label->setAnchorPoint(menu_pause->getAnchorPoint());
 		label->setPosition(menu_pause->getPosition());
@@ -322,7 +322,7 @@ void MyGame::game_over(gameOverState state) {
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("lose.wav");
 		}
-		auto label_failed = Label::createWithSystemFont(get_UTF8_string("failed"), "abc", BIG_LABEL_FONT_SIZE);
+		auto label_failed = Label::createWithTTF(get_UTF8_string("failed"), "font.ttf", BIG_LABEL_FONT_SIZE);
 		label_failed->setColor(Color3B::RED);
 		label_failed->setAnchorPoint(menu_pause->getAnchorPoint());
 		label_failed->setPosition(menu_pause->getPosition());
@@ -362,7 +362,7 @@ void MyGame::print_log(string str) {
 	auto label_score = (Label*)this->getChildByName("label_score");
 	auto label_log = (Label*)this->getChildByName("label_log");
 	if (!label_log) {
-		label_log = Label::createWithSystemFont("", "abc", SMALL_LABEL_FONT_SIZE);
+		label_log = Label::createWithTTF("", "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label_log->setName("label_log");
 		this->addChild(label_log);
 	}
@@ -389,13 +389,14 @@ void MyGame::set_pause(bool pause) {
 		menu_back->setVisible(isUpdate);
 		menu_again->setVisible(isUpdate);
 		menu_pause->setVisible(!isUpdate);
+		((Node*)menu_pause->getUserObject())->setVisible(isUpdate);
 		isUpdate = !isUpdate;
 	}
 }
 
 void MyGame::set_UI() {
 	float x = origin.x + 20, y = origin.y + visible_size.height;
-	auto label_goal = Label::createWithSystemFont(get_UTF8_string("goal"), "abc", MID_LABEL_FONT_SIZE);
+	auto label_goal = Label::createWithTTF(get_UTF8_string("goal"), "font.ttf", MID_LABEL_FONT_SIZE);
 	label_goal->setAnchorPoint(Vec2(0, 1));
 	label_goal->setPosition(0, y);
 	this->addChild(label_goal);
@@ -404,7 +405,7 @@ void MyGame::set_UI() {
 		auto sprite = Sprite::create("apple.png");
 		sprite->setAnchorPoint(Vec2(0, 1));
 		sprite->setPosition(x, y);
-		auto label = Label::createWithSystemFont(" x" + Value(bug).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+		auto label = Label::createWithTTF(" x" + Value(bug).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label->setAnchorPoint(Vec2(0, 1));
 		label->setPosition(x + sprite->getContentSize().width, y);
 		label->setName("label_apple");
@@ -416,7 +417,7 @@ void MyGame::set_UI() {
 		auto sprite = Sprite::create("snake.png");
 		sprite->setAnchorPoint(Vec2(0, 1));
 		sprite->setPosition(x, y);
-		auto label = Label::createWithSystemFont(" x" + Value(kill).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+		auto label = Label::createWithTTF(" x" + Value(kill).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label->setAnchorPoint(Vec2(0, 1));
 		label->setPosition(x + sprite->getContentSize().width, y);
 		label->setName("label_kill");
@@ -428,7 +429,7 @@ void MyGame::set_UI() {
 		auto sprite = Sprite::create("bug.png");
 		sprite->setAnchorPoint(Vec2(0, 1));
 		sprite->setPosition(x, y);
-		auto label = Label::createWithSystemFont(" x" + Value(bug).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+		auto label = Label::createWithTTF(" x" + Value(bug).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label->setAnchorPoint(Vec2(0, 1));
 		label->setPosition(x + sprite->getContentSize().width, y);
 		label->setName("label_bug");
@@ -440,7 +441,7 @@ void MyGame::set_UI() {
 		auto sprite = Sprite::create("flower.png");
 		sprite->setAnchorPoint(Vec2(0, 1));
 		sprite->setPosition(x, y);
-		auto label = Label::createWithSystemFont(" x" + Value(flower).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+		auto label = Label::createWithTTF(" x" + Value(flower).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label->setAnchorPoint(Vec2(0, 1));
 		label->setPosition(x + sprite->getContentSize().width, y);
 		label->setName("label_flower");
@@ -450,7 +451,7 @@ void MyGame::set_UI() {
 	}
 	y -= 40;
 
-	auto label_state = Label::createWithSystemFont(get_UTF8_string("state"), "abc", MID_LABEL_FONT_SIZE);
+	auto label_state = Label::createWithTTF(get_UTF8_string("state"), "font.ttf", MID_LABEL_FONT_SIZE);
 	label_state->setAnchorPoint(Vec2(0, 1));
 	label_state->setPosition(0, y);
 	this->addChild(label_state);
@@ -461,21 +462,21 @@ void MyGame::set_UI() {
 	sprite->setPosition(x, y);
 	sprite->setName("sprite_heart");
 	this->addChild(sprite);
-	auto label_heart = Label::createWithSystemFont(" x" + Value(heart).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+	auto label_heart = Label::createWithTTF(" x" + Value(heart).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 	label_heart->setAnchorPoint(Vec2(0, 1));
 	label_heart->setPosition(x + sprite->getContentSize().width + 5, y);
 	label_heart->setName("label_heart");
 	this->addChild(label_heart);
 	y -= sprite->getContentSize().height + 5;
 
-	auto label_hunger = Label::createWithSystemFont(get_UTF8_string("hunger") + "0/" + Value(max_hunger).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+	auto label_hunger = Label::createWithTTF(get_UTF8_string("hunger") + "0/" + Value(max_hunger).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 	label_hunger->setAnchorPoint(Vec2(0, 1));
 	label_hunger->setPosition(x, y);
 	label_hunger->setName("label_hunger");
 	this->addChild(label_hunger);
 	y -= label_hunger->getContentSize().height + 5;
 
-	auto label_score = Label::createWithSystemFont(get_UTF8_string("score") + "0", "abc", SMALL_LABEL_FONT_SIZE);
+	auto label_score = Label::createWithTTF(get_UTF8_string("score") + "0", "font.ttf", SMALL_LABEL_FONT_SIZE);
 	label_score->setAnchorPoint(Vec2(0, 1));
 	label_score->setPosition(x, y);
 	label_score->setName("label_score");
@@ -580,7 +581,13 @@ void MyGame::set_Ctrl() {
 	menu_back->setVisible(false);
 	menu_pause->setAnchorPoint(Vec2(0, 0));
 	menu_pause->setPosition(x, y);
-	auto label_pause = Label::createWithSystemFont(" x" + Value(pause_n).asString(), "abc", SMALL_LABEL_FONT_SIZE);
+	auto label_go_on = Label::createWithTTF(get_UTF8_string("go on text"), "font.ttf", SMALL_LABEL_FONT_SIZE);
+	label_go_on->setAnchorPoint(menu_pause->getAnchorPoint());
+	label_go_on->setPosition(menu_pause->getPosition());
+	menu_pause->setUserObject(label_go_on);
+	label_go_on->setVisible(false);
+	this->addChild(label_go_on);
+	auto label_pause = Label::createWithTTF(" x" + Value(pause_n).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 	label_pause->setName("label_pause");
 	label_pause->setAnchorPoint(Vec2(0, 0));
 	label_pause->setPosition(Vec2(menu_pause->getContentSize().width, 0));
@@ -646,7 +653,12 @@ void MyGame::set_Ctrl() {
 					v = t->getLocation() - (origin + visible_size / 2);
 					DIRECTION dir = set_dir(v);
 					if (has_player) {
-						if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir))) {
+						int steps = Snake::step_length - snakes[0]->get_step();
+						int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
+						if (steps <= 0) {
+							time_s = 0;
+						}
+						if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir), time_s)) {
 							snakes[0]->turn(dir);
 							set_pause(false);
 						}
@@ -672,7 +684,12 @@ void MyGame::set_Ctrl() {
 			if (fabs(pos.x - touch_begin->x) > touch_move_len || fabs(pos.y - touch_begin->y) > touch_move_len) {
 				DIRECTION dir = set_dir(pos - *touch_begin);
 				if (has_player) {
-					if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir))) {
+					int steps = Snake::step_length - snakes[0]->get_step();
+					int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
+					if (steps <= 0) {
+						time_s = 0;
+					}
+					if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir), time_s)) {
 						snakes[0]->turn(dir);
 						set_pause(false);
 					}
@@ -713,7 +730,12 @@ void MyGame::set_Ctrl() {
 			return;
 		}
 		if (has_player) {
-			if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir))) {
+			int steps = Snake::step_length - snakes[0]->get_step();
+			int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
+			if (steps <= 0) {
+				time_s = 0;
+			}
+			if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir), time_s)) {
 				snakes[0]->turn(dir);
 				set_pause(false);
 			}
