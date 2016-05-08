@@ -2,9 +2,9 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="24" height="22" tilewidth="32" tileheight="32" nextobjectid="26">
  <properties>
   <property name="bug" value="3"/>
-  <property name="flower" value="10"/>
+  <property name="flower" value="9"/>
   <property name="kill" value="0"/>
-  <property name="score" value="111,622,1233"/>
+  <property name="score" value="5000,6000,8000"/>
  </properties>
  <tileset firstgid="1" name="foods" tilewidth="32" tileheight="32" tilecount="16" columns="4">
   <image source="foods.png" width="128" height="128"/>
@@ -46,13 +46,13 @@
   </tile>
   <tile id="6">
    <properties>
-    <property name="cooldown" value="10"/>
+    <property name="cooldown" value="20"/>
     <property name="max_num" value="1"/>
    </properties>
   </tile>
   <tile id="7">
    <properties>
-    <property name="cooldown" value="3"/>
+    <property name="cooldown" value="2"/>
     <property name="max_num" value="3"/>
    </properties>
   </tile>

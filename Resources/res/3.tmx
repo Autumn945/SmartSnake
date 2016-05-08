@@ -4,20 +4,20 @@
   <property name="bug" value="5"/>
   <property name="flower" value="10"/>
   <property name="kill" value="0"/>
-  <property name="score" value="1000,2000,3000"/>
+  <property name="score" value="4000,6000,8000"/>
  </properties>
  <tileset firstgid="1" name="foods" tilewidth="32" tileheight="32" tilecount="16" columns="4">
   <image source="foods.png" width="128" height="128"/>
   <tile id="0">
    <properties>
     <property name="cooldown" value="3"/>
-    <property name="max_num" value="-1"/>
+    <property name="max_num" value="2"/>
    </properties>
   </tile>
   <tile id="1">
    <properties>
-    <property name="cooldown" value="4"/>
-    <property name="max_num" value="-1"/>
+    <property name="cooldown" value="5"/>
+    <property name="max_num" value="1"/>
    </properties>
   </tile>
   <tile id="2">
@@ -46,14 +46,14 @@
   </tile>
   <tile id="6">
    <properties>
-    <property name="cooldown" value="10"/>
+    <property name="cooldown" value="20"/>
     <property name="max_num" value="1"/>
    </properties>
   </tile>
   <tile id="7">
    <properties>
-    <property name="cooldown" value="2"/>
-    <property name="max_num" value="2"/>
+    <property name="cooldown" value="3"/>
+    <property name="max_num" value="3"/>
    </properties>
   </tile>
  </tileset>
@@ -1663,11 +1663,11 @@
     <property name="speed" value="30"/>
    </properties>
   </object>
-  <object id="22" name="smartsnake" type="enemy" x="592" y="528">
+  <object id="22" name="xiaoqing" type="friend" x="240" y="464">
    <properties>
-    <property name="direction" value="3"/>
-    <property name="hated_food" value="128"/>
-    <property name="speed" value="25"/>
+    <property name="direction" value="1"/>
+    <property name="hated_food" value="0"/>
+    <property name="speed" value="30"/>
    </properties>
   </object>
  </objectgroup>

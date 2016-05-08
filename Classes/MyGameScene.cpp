@@ -112,7 +112,7 @@ bool MyGame::init(int mission_id) {
 }
 
 void MyGame::update(float dt) {
-	if (has_player && bug <= 0 && flower <= 0 && kill <= 0) {
+	if (has_player && apple <= 0 && bug <= 0 && flower <= 0 && kill <= 0) {
 		game_over(win);
 		return;
 	}
@@ -405,7 +405,7 @@ void MyGame::set_UI() {
 		auto sprite = Sprite::create("apple.png");
 		sprite->setAnchorPoint(Vec2(0, 1));
 		sprite->setPosition(x, y);
-		auto label = Label::createWithTTF(" x" + Value(bug).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
+		auto label = Label::createWithTTF(" x" + Value(apple).asString(), "font.ttf", SMALL_LABEL_FONT_SIZE);
 		label->setAnchorPoint(Vec2(0, 1));
 		label->setPosition(x + sprite->getContentSize().width, y);
 		label->setName("label_apple");

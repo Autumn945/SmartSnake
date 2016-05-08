@@ -139,6 +139,9 @@ bool GameMap::is_empty(pii pos, int delay, Snake *ignore) {
 	auto sp = snake_map[pos.first][pos.second];
 	if (sp) {
 		auto snake = (Snake*)sp->getParent();
+		if (snake->get_is_died()) {
+			return false;
+		}
 		if (snake == ignore) {
 			return true;
 		}

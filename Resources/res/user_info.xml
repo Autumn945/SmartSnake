@@ -5,49 +5,55 @@
     <dict>
         <key>mission_score0</key>
         <integer>0</integer>
-        <key>current_mission</key>
-        <integer>4</integer>
         <key>mission_success0</key>
         <integer>0</integer>
+        <key>current_mission</key>
+        <integer>1</integer>
         <key>mission_challenge0</key>
         <integer>0</integer>
         <key>mission_success1</key>
-        <integer>4</integer>
+        <integer>0</integer>
+        <key>mission_success10</key>
+        <integer>0</integer>
         <key>music</key>
-        <integer>0</integer>
-        <key>control_mode</key>
-        <integer>0</integer>
         <key>mission_score6</key>
         <integer>0</integer>
         <key>soundEffects</key>
-        <integer>0</integer>
         <key>mission_score1</key>
-        <integer>5550</integer>
+        <integer>0</integer>
         <key>mission_challenge1</key>
-        <integer>4</integer>
+        <integer>0</integer>
         <key>mission_score2</key>
-        <integer>10095</integer>
+        <integer>0</integer>
         <key>mission_success2</key>
-        <integer>1</integer>
+        <integer>0</integer>
         <key>mission_challenge2</key>
-        <integer>6</integer>
+        <integer>0</integer>
         <key>mission_score3</key>
-        <integer>5350</integer>
+        <integer>0</integer>
+        <key>mission_challenge10</key>
+        <integer>0</integer>
         <key>mission_success3</key>
-        <integer>1</integer>
+        <integer>0</integer>
         <key>mission_challenge3</key>
-        <integer>4</integer>
+        <integer>0</integer>
+        <key>mission_success9</key>
+        <integer>0</integer>
         <key>mission_score4</key>
+        <integer>0</integer>
+        <key>mission_score9</key>
         <integer>0</integer>
         <key>mission_success4</key>
         <integer>0</integer>
         <key>mission_challenge4</key>
-        <integer>1</integer>
+        <integer>0</integer>
+        <key>mission_success8</key>
+        <integer>0</integer>
         <key>mission_score5</key>
         <integer>0</integer>
-        <key>mission_success5</key>
+        <key>mission_score8</key>
         <integer>0</integer>
-        <key>clear</key>
+        <key>mission_success5</key>
         <integer>0</integer>
         <key>mission_challenge5</key>
         <integer>0</integer>
@@ -60,6 +66,12 @@
         <key>mission_success7</key>
         <integer>0</integer>
         <key>mission_challenge7</key>
+        <integer>0</integer>
+        <key>mission_challenge8</key>
+        <integer>0</integer>
+        <key>mission_challenge9</key>
+        <integer>0</integer>
+        <key>mission_score10</key>
         <integer>0</integer>
     </dict>
 </plist>

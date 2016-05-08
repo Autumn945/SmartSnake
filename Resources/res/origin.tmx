@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="24" height="22" tilewidth="32" tileheight="32" nextobjectid="26">
  <properties>
+  <property name="apple" value="0"/>
   <property name="bug" value="0"/>
   <property name="flower" value="0"/>
   <property name="kill" value="0"/>
@@ -1124,7 +1125,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="grass" width="24" height="22" opacity="0.87">
+ <layer name="grass" width="24" height="22" opacity="0.7">
   <data>
    <tile gid="0"/>
    <tile gid="0"/>
