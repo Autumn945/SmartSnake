@@ -65,6 +65,7 @@ const int max_game_height = 22;
 extern const int food_score[foods_num];
 
 extern const pii dir_vector[4];
+extern string writable_path;
 
 extern ValueMap UTF8_string;
 extern ValueMap user_info;

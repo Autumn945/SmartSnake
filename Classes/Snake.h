@@ -20,7 +20,7 @@ public:
 	DEFINE_VAR_GET(int, current_dir);
 	DEFINE_VAR_GET(pii, position);
 	DEFINE_VAR_GET(string, image);
-	DEFINE_VAR_GET(bool, is_died);
+	DEFINE_VAR_GET_SET(bool, is_died);
 	DEFINE_VAR_GET(bool, is_checked);
 	DEFINE_VAR_GET_SET(int, length);
 	DEFINE_VAR_GET_ADD(int, hunger);

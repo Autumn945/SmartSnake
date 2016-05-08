@@ -41,18 +41,6 @@ bool Mission::init(int id) {
 	log("%d,%d,%d", flower[0], flower[1], flower[2]);
 	//
 	string id_string = Value(id).asString();
-	if (user_info.count("mission_score" + id_string) == 0) {
-		user_info["mission_score" + id_string] = 0;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
-	}
-	if (user_info.count("mission_success" + id_string) == 0) {
-		user_info["mission_success" + id_string] = 0;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
-	}
-	if (user_info.count("mission_challenge" + id_string) == 0) {
-		user_info["mission_challenge" + id_string] = 0;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
-	}
 	score = user_info["mission_score" + id_string].asInt();
 	success = user_info["mission_success" + id_string].asInt();
 	challenge = user_info["mission_challenge" + id_string].asInt();

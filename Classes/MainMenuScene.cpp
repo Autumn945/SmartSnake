@@ -21,6 +21,10 @@ bool MainMenu::init() {
 		return false;
 	}
 	log("MainMenu init");
+	user_info["current_mission"] = max(1, user_info["current_mission"].asInt());
+
+	FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
+
 	auto center = origin + visible_size / 2;
 	auto sp = Sprite::create("start.png");
 	CCASSERT(sp, "start.png has not found");
@@ -29,8 +33,6 @@ bool MainMenu::init() {
 	game = MyGame::create(0);
 	this->addChild(game);
 	//scheduleUpdate();
-	user_info["current_mission"] = max(1, user_info["current_mission"].asInt());
-	FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
 	//(0.5, 1 - 0.618)
 	auto position = Vec2(origin.x + visible_size.width / 2
 		, origin.y + visible_size.height * (1 - 0.85));
@@ -66,8 +68,8 @@ bool MainMenu::init() {
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 		}
-		Director::getInstance()->end();
 		CocosDenshion::SimpleAudioEngine::getInstance()->end();
+		Director::getInstance()->end();
 	});
 
 	//add into a vector

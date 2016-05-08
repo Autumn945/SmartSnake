@@ -16,6 +16,7 @@ const int food_score[foods_num] = { 150, 150, 100, 100, 200, 200, 200, -100 };
 // origin is the left-up corner
 // 0->up, 1->right, 2->down, 3->right
 const pii dir_vector[4] = { pii(0, -1), pii(1, 0), pii(0, 1), pii(-1, 0) };
+string writable_path;
 
 // string to chinese characters
 ValueMap UTF8_string;
@@ -27,8 +28,9 @@ bool init() {
 	UTF8_string = FileUtils::getInstance()->getValueMapFromFile("UTF8_string.xml");
 	CCASSERT(UTF8_string.size(), "!!!!!!!!!!!!!!!!!! size of UTF8_string is 0");
 
-	user_info = FileUtils::getInstance()->getValueMapFromFile("user_info.xml");
-	
+	writable_path = FileUtils::getInstance()->getWritablePath();
+	user_info = FileUtils::getInstance()->getValueMapFromFile(writable_path + "user_info.xml");
+
 	visible_size = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 

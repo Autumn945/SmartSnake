@@ -108,6 +108,7 @@ bool MyGame::init(int mission_id) {
 	}
 
 	scheduleUpdate();
+
 	return true;
 }
 
@@ -260,6 +261,8 @@ void MyGame::update_dir() {
 
 void MyGame::game_over(gameOverState state) {
 	unscheduleUpdate();
+	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_touch);
+	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_key);
 	CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 	string id_string = Value(this->getTag()).asString();
 	menu_back->setString(get_UTF8_string("back"));
@@ -269,6 +272,7 @@ void MyGame::game_over(gameOverState state) {
 	turn_1->setVisible(false);
 	turn_2->setVisible(false);
 	menu_clear_dir->setVisible(false);
+	snakes[0]->set_is_died(true);
 	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_key);
 	Director::getInstance()->getEventDispatcher()->removeEventListener(listener_touch);
 	if (state == win) {
@@ -294,7 +298,7 @@ void MyGame::game_over(gameOverState state) {
 		print_log(str);
 		user_info["mission_success" + id_string] = user_info["mission_success" + id_string].asInt() + 1;
 		user_info["current_mission"] = max(this->getTag() + 1, user_info["current_mission"].asInt());
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
+		FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 
 		auto label = Label::createWithTTF(get_UTF8_string("win"), "font.ttf", MID_LABEL_FONT_SIZE);
 		label->setColor(Color3B::RED);
@@ -360,6 +364,9 @@ void MyGame::game_over(gameOverState state) {
 
 void MyGame::print_log(string str) {
 	auto label_score = (Label*)this->getChildByName("label_score");
+	if (!label_score) {
+		return;
+	}
 	auto label_log = (Label*)this->getChildByName("label_log");
 	if (!label_log) {
 		label_log = Label::createWithTTF("", "font.ttf", SMALL_LABEL_FONT_SIZE);
@@ -536,7 +543,7 @@ void MyGame::set_Ctrl() {
 		}
 		string id_string = Value(this->getTag()).asString();
 		user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
+		FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 		auto next_scene = GameMenu::createScene();
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 		Director::getInstance()->replaceScene(Transition_scene);
@@ -550,7 +557,7 @@ void MyGame::set_Ctrl() {
 		}
 		string id_string = Value(this->getTag()).asString();
 		user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
+		FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 		auto next_scene = MyGame::createScene(this->getTag());
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 		Director::getInstance()->replaceScene(Transition_scene);
@@ -729,6 +736,7 @@ void MyGame::set_Ctrl() {
 		default:
 			return;
 		}
+		//this->print_log("onKeyPressed" + Value((int)key).asString());
 		if (has_player) {
 			int steps = Snake::step_length - snakes[0]->get_step();
 			int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
@@ -744,6 +752,28 @@ void MyGame::set_Ctrl() {
 			}
 		}
 		update_dir();
+	};
+	listener_key->onKeyReleased = [this](EventKeyboard::KeyCode key, Event *e) {
+		//this->print_log("onKeyReleased" + Value((int)key).asString());
+		switch (key) {
+		case EventKeyboard::KeyCode::KEY_ESCAPE:
+		case EventKeyboard::KeyCode::KEY_MENU:
+			if (!isUpdate) {
+				return;
+			}
+			if (pause_n <= 0) {
+				game_map->setVisible(false);
+			}
+			else {
+				add_pause_n(-1);
+				auto label = (Label*)menu_pause->getChildByName("label_pause");
+				label->setString(" x" + Value(this->get_pause_n()).asString());
+			}
+			this->set_pause(true);
+			break;
+		default:
+			return;
+		}
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_touch, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_key, this);

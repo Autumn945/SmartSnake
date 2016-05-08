@@ -37,7 +37,7 @@ bool Option::init() {
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 		}
-		FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
+		FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 		auto next_scene = MainMenu::createScene(); 
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene); 
 		Director::getInstance()->replaceScene(Transition_scene);
@@ -139,7 +139,7 @@ bool Option::init() {
 			user_info["clear"] = user_info["clear"].asInt() + 1;
 			if (user_info["clear"].asInt() >= 5) {
 				user_info.clear();
-				FileUtils::getInstance()->writeValueMapToFile(user_info, "res/user_info.xml");
+				FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 				auto next_scene = MainMenu::createScene();
 				auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 				Director::getInstance()->replaceScene(Transition_scene);
