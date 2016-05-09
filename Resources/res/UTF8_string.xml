@@ -81,13 +81,6 @@
     
     
     
-      
-      
-        
-        
-     
-      
-    
     <key>go on text</key>
     <string>控制前进方向
 继续游戏</string>
@@ -97,7 +90,7 @@
     <string>本作品中音乐，音效，主界面图片，食物图片，字体和其他一些小图标来自网络，其他均为原创.
     本作品作者拥有其原创内容的所有权.
   
-    版本号：2.2.160509_beta</string>
+    版本号：2.3.160509_beta</string>
     
     <key>text_feedback</key>
     <string>有任何问题或者意见请联系作者
@@ -131,7 +124,7 @@
 </string>
     
     <key>menu_help_3</key>
-    <string>小绿小青和小紫</string>
+    <string>小伙伴们</string>
     <key>text_help_3</key>
     <string>    绿色的蛇叫小绿，小绿是你。
     青色的蛇叫小青，小青是你的随从，小青的速度和方向会一直跟你保持一样。若小青撞了你的爱心数量会清零，若爱心数量清零之前就是0，则游戏失败。小青吃的食物有50%的概率会相当于你吃的(不会增加你的长度和降低你的饥饿值)。
@@ -229,6 +222,16 @@
     <string>
 踩到便便了
 感觉自己萌萌哒
+</string>
+    
+    
+    <key>hungry</key>
+    <string>
+饿了~
+</string>
+    <key>can not go</key>
+    <string>
+前路不通
 </string>
     
     <key>no way</key>

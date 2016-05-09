@@ -140,10 +140,7 @@ pii SmartSnake::dfs_get_accessible_last_snake_node_dir(pii now, int step, int di
 		}
 	}
 	auto steps = (step + 1) * Snake::step_length - this->get_step();
-	auto time_snake = (steps - 1) / this->get_speed() + 1;
-	if (steps <= 0) {
-		time_snake = 0;
-	}
+	auto time_snake = (steps + this->get_speed() - 1) / this->get_speed();
 	for (int i = 0; i < 4; i++) {
 		int c_dir = dir_f[i];
 		if (abs(c_dir - dir) == 2) {
@@ -241,10 +238,7 @@ int SmartSnake::get_target_shortest_path_dir(pii position, int current_dir, int 
 					}
 				}
 				int steps = step * Snake::step_length - this->get_step();
-				int time_s = (steps - 1) / this->get_speed() + 1;
-				if (steps <= 0) {
-					time_s = 0;
-				}
+				int time_s = (steps + this->get_speed() - 1) / this->get_speed();
 				if (!game_map->is_empty(nxt, time_s)) {
 					continue;
 				}

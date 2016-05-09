@@ -147,10 +147,7 @@ bool GameMap::is_empty(pii pos, int delay, Snake *ignore) {
 		}
 		int length = sp->getTag() - snake->get_tail_time_stamp() + 1;
 		int steps = length * Snake::step_length - snake->get_step();
-		auto time_snake = (steps - 1) / snake->get_speed() + 1;
-		if (steps <= 0) {
-			time_snake = 0;
-		}
+		auto time_snake = (steps + snake->get_speed() - 1) / snake->get_speed();
 		if (time_snake > delay) {
 			return false;
 		}

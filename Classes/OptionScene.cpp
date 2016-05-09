@@ -44,6 +44,24 @@ bool Option::init() {
 	});
 	menu_back->setAnchorPoint(Vec2(1, 0));
 	menu_back->setPosition(origin.x + visible_size.width, origin.y);
+	auto listener_key = EventListenerKeyboard::create();
+	listener_key->onKeyReleased = [](EventKeyboard::KeyCode key, Event *e) {
+		switch (key) {
+		case EventKeyboard::KeyCode::KEY_ESCAPE:
+		{
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
+			auto next_scene = MainMenu::createScene();
+			auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
+			Director::getInstance()->replaceScene(Transition_scene);
+		}
+			break;
+		default:
+			return;
+		}
+	};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_key, this);
 	//create menu item
 	auto menu = Menu::create(menu_back, NULL);
 	menu->setAnchorPoint(Vec2::ZERO);
@@ -201,7 +219,7 @@ bool Option::init() {
 			menu_help->setTag(i);
 			menu->addChild(menu_help);
 			y -= menu_help->getContentSize().height + 10;
-			label_help->setPositionX(max(label_help->getPositionX(), x + menu_help->getContentSize().width * 1.0f));
+			label_help->setPositionX(max(label_help->getPositionX(), x + menu_help->getContentSize().width * 1.5f));
 		}
 		label_help->setDimensions(visible_size.width - 1.5f * label_help->getPositionX(), visible_size.height);
 		//label_help->setMaxLineWidth(visible_size.width - 2 * label_help->getPositionX());

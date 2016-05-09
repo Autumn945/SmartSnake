@@ -143,11 +143,14 @@ void MyGame::update(float dt) {
 		}
 		if (!can_go && get_heart() > 0) {
 			add_heart(-1);
+			print_log(get_UTF8_string("can not go"));
 			snakes[0]->turn_1 = snakes[0]->turn_2 = -1;
-			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pang.wav");
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pang.wav");
+			}
+			Device::vibrate(0.5);
 			auto label_heart = (Label*)this->getChildByName("label_heart");
 			label_heart->setString(" x" + Value(this->get_heart()).asString());
-			Device::vibrate(0.5);
 			sprite_ban->setPosition(snakes[0]->convertToWorldSpace(
 				snakes[0]->get_snake_nodes()->back()->getPosition() + UNIT * Vec2(dir_vector[dir].first, -dir_vector[dir].second)));
 			auto action = Blink::create(2, 5);
@@ -187,6 +190,10 @@ void MyGame::update(float dt) {
 	for (auto snake : snakes) {
 		snake->go_step();
 	}
+	snakes[0]->check();
+	if (snakes[0]->get_is_died()) {
+		return;
+	}
 	for (auto snake : snakes) {
 		if (!snake->get_is_checked()) {
 			snake->check();
@@ -213,6 +220,7 @@ void MyGame::update(float dt) {
 			if (this->get_heart() == -1) {
 				this->add_heart(-1);
 			}
+			print_log(get_UTF8_string("hungry"));
 			Device::vibrate(0.2f);
 			if (user_info["soundEffects"].asInt() == 0) {
 				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("hunger.wav");
@@ -661,10 +669,7 @@ void MyGame::set_Ctrl() {
 					DIRECTION dir = set_dir(v);
 					if (has_player) {
 						int steps = Snake::step_length - snakes[0]->get_step();
-						int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
-						if (steps <= 0) {
-							time_s = 0;
-						}
+						int time_s = (steps + snakes[0]->get_speed() - 1) / snakes[0]->get_speed();
 						if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir), time_s)) {
 							snakes[0]->turn(dir);
 							set_pause(false);
@@ -692,10 +697,7 @@ void MyGame::set_Ctrl() {
 				DIRECTION dir = set_dir(pos - *touch_begin);
 				if (has_player) {
 					int steps = Snake::step_length - snakes[0]->get_step();
-					int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
-					if (steps <= 0) {
-						time_s = 0;
-					}
+					int time_s = (steps + snakes[0]->get_speed() - 1) / snakes[0]->get_speed();
 					if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir), time_s)) {
 						snakes[0]->turn(dir);
 						set_pause(false);
@@ -739,10 +741,7 @@ void MyGame::set_Ctrl() {
 		//this->print_log("onKeyPressed" + Value((int)key).asString());
 		if (has_player) {
 			int steps = Snake::step_length - snakes[0]->get_step();
-			int time_s = (steps - 1) / snakes[0]->get_speed() + 1;
-			if (steps <= 0) {
-				time_s = 0;
-			}
+			int time_s = (steps + snakes[0]->get_speed() - 1) / snakes[0]->get_speed();
 			if (!isUpdate && game_map->is_empty(game_map->get_next_position(snakes[0]->get_position(), dir), time_s)) {
 				snakes[0]->turn(dir);
 				set_pause(false);
@@ -758,6 +757,9 @@ void MyGame::set_Ctrl() {
 		switch (key) {
 		case EventKeyboard::KeyCode::KEY_ESCAPE:
 		case EventKeyboard::KeyCode::KEY_MENU:
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
 			if (!isUpdate) {
 				return;
 			}
@@ -775,6 +777,6 @@ void MyGame::set_Ctrl() {
 			return;
 		}
 	};
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_touch, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_key, this);
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_touch, this);
 }

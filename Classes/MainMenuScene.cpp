@@ -179,6 +179,49 @@ bool MainMenu::init() {
 	vector_menu[menu_id]->setRotation3D(Vec3(0, 0, 0));
 	vector_menu[menu_id]->setOpacity(255);
 	vector_menu[menu_id]->setVisible(true);
+
+
+	auto listener_key = EventListenerKeyboard::create();
+	listener_key->onKeyReleased = [=](EventKeyboard::KeyCode key, Event *e) {
+		switch (key) {
+		case EventKeyboard::KeyCode::KEY_ESCAPE:
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
+			}
+			CocosDenshion::SimpleAudioEngine::getInstance()->end();
+			Director::getInstance()->end();
+			break;
+		case EventKeyboard::KeyCode::KEY_MENU:
+		{
+			if (ac_turn_mid->isDone() + ac_turn_mid->getTag() == 0) {
+				return;
+			}
+			if (user_info["soundEffects"].asInt() == 0) {
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("turn.wav");
+			}
+			//if ac_turn_mid has been run, set tag = 0
+			ac_turn_mid->setTag(0);
+			//run action
+			vector_menu[menu_id]->runAction(ac_turn_left);
+			//next menu id
+			menu_id = (menu_id + 1) % vector_menu.size();
+			//init menu item
+			vector_menu[menu_id]->stopAllActions();
+			vector_menu[menu_id]->setPosition(position + Vec2(menu_item_width / 2, 0));
+			vector_menu[menu_id]->setRotation3D(Vec3(0, 90, 0));
+			vector_menu[menu_id]->setOpacity(100);
+			vector_menu[menu_id]->setVisible(false);
+			//run action
+			vector_menu[menu_id]->runAction(ac_turn_mid);
+		}
+		break;
+		default:
+			return;
+		}
+	};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener_key, this);
+
+
 	if (!CocosDenshion::SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying() && user_info["music"].asInt() == 0) {
 		CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("start.wav", true);
 	}
