@@ -542,6 +542,9 @@ void MyGame::set_UI() {
 }
 
 void MyGame::set_Ctrl() {
+	string id_string = Value(this->getTag()).asString();
+	user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
+	FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 	float x = origin.x + visible_size.width - 8 * UNIT + 10;
 	float y = origin.y;
 	menu_back = MenuItemFont::create(get_UTF8_string("abandon"), [this](Ref *sender) {
@@ -549,9 +552,6 @@ void MyGame::set_Ctrl() {
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 		}
-		string id_string = Value(this->getTag()).asString();
-		user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 		auto next_scene = GameMenu::createScene();
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 		Director::getInstance()->replaceScene(Transition_scene);
@@ -563,9 +563,6 @@ void MyGame::set_Ctrl() {
 		if (user_info["soundEffects"].asInt() == 0) {
 			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("button.wav");
 		}
-		string id_string = Value(this->getTag()).asString();
-		user_info["mission_challenge" + id_string] = user_info["mission_challenge" + id_string].asInt() + 1;
-		FileUtils::getInstance()->writeValueMapToFile(user_info, writable_path + "user_info.xml");
 		auto next_scene = MyGame::createScene(this->getTag());
 		auto Transition_scene = TransitionCrossFade::create(SCENE_TURN_TRANSITION_TIME, next_scene);
 		Director::getInstance()->replaceScene(Transition_scene);
