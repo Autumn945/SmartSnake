@@ -17,8 +17,12 @@ public:
 	DEFINE_VAR_GET(TMXLayer*, wall);
 	pii to_tile_map_pos(Vec2 pos);
 	Vec2 to_cocos_pos(pii pos);
-	bool is_wall(pii pos);
+	static const int random_wall = 29;
+	static const int true_wall = 17;
+	int wall_id(pii pos);
 	int food_id(pii pos);
+	void set_wall(pii pos, int id);
+	void set_food(pii pos, int id);
 	~GameMap();
 	static GameMap* createWithTMXFile(string file_name);
 	virtual bool initWithTMXFile(string);

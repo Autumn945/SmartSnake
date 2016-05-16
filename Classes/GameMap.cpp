@@ -17,11 +17,11 @@ Vec2 GameMap::to_cocos_pos(pii pos) {
 	return Vec2(pos.first, pos.second) * UNIT;
 }
 
-bool GameMap::is_wall(pii pos) {
+int GameMap::wall_id(pii pos) {
 	if (!wall) {
-		 return false;
+		return false;
 	}
-	return wall->getTileGIDAt(Vec2(pos.first, pos.second)) > 0;
+	return wall->getTileGIDAt(Vec2(pos.first, pos.second));
 }
 
 int GameMap::food_id(pii pos) {
@@ -29,6 +29,20 @@ int GameMap::food_id(pii pos) {
 		return 0;
 	}
 	return food->getTileGIDAt(Vec2(pos.first, pos.second));
+}
+
+void GameMap::set_wall(pii pos, int id) {
+	if (!wall) {
+		return;
+	}
+	wall->setTileGID(id, Vec2(pos.first, pos.second));
+}
+
+void GameMap::set_food(pii pos, int id) {
+	if (!food) {
+		return;
+	}
+	food->setTileGID(id, Vec2(pos.first, pos.second));
 }
 
 GameMap * GameMap::createWithTMXFile(string file_name) {
@@ -70,7 +84,21 @@ bool GameMap::initWithTMXFile(string file_name) {
 	empty_n = this->getMapSize().width * this->getMapSize().height;
 	for (int i = 0; i < this->getMapSize().width; i++) {
 		for (int j = 0; j < this->getMapSize().height; j++) {
-			if (is_wall(pii(i, j))) {
+			auto wid = wall_id(pii(i, j));
+			if (wid >= random_wall) {
+				auto gid_v = this->getPropertiesForGID(wid);
+				if (gid_v.isNull()) {
+					gid_v = ValueMap();
+				}
+				auto probability = gid_v.asValueMap()["probability"].asInt();
+				if (random(1, 100) > probability) {
+					set_wall(pii(i, j), 0);
+				}
+				else {
+					set_wall(pii(i, j), true_wall);
+				}
+			}
+			if (wall_id(pii(i, j))) {
 				empty_n--;
 			}
 		}
@@ -85,7 +113,7 @@ vector<pii> GameMap::get_all_empty_points() {
 	auto height = float_to_int(this->getMapSize().height);
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			if (!is_wall(pii(i, j))
+			if (!wall_id(pii(i, j))
 				&& mp[i][j] == NULL
 				&& food_id(pii(i, j)) == 0) {
 				ret.push_back(pii(i, j));
@@ -107,7 +135,7 @@ pii GameMap::get_random_empty_point() {
 			break;
 		}
 		ret = pii(random(0, width - 1),  random(0, height - 1));
-	} while (is_wall(ret)
+	} while (wall_id(ret)
 		|| mp[ret.first][ret.second]
 		|| food_id(ret) > 0);
 	if (r < 0) {
@@ -133,7 +161,7 @@ bool GameMap::is_empty(pii pos, int delay, Snake *ignore) {
 		log("********************************************************************************************");
 		return false;
 	}
-	if (is_wall(pos)) {
+	if (wall_id(pos)) {
 		return false;
 	}
 	auto sp = snake_map[pos.first][pos.second];

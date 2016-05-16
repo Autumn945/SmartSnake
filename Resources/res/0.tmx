@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="24" height="22" tilewidth="32" tileheight="32" nextobjectid="27">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="24" height="22" tilewidth="32" tileheight="32" backgroundcolor="#989898">
  <properties>
   <property name="bug" value="0"/>
   <property name="flower" value="0"/>
   <property name="kill" value="0"/>
   <property name="score" value="1000,2000,3000"/>
  </properties>
- <tileset firstgid="1" name="foods" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+ <tileset firstgid="1" name="foods" tilewidth="32" tileheight="32">
   <image source="foods.png" width="128" height="128"/>
   <tile id="0">
    <properties>
@@ -57,8 +57,13 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="17" name="tiles" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+ <tileset firstgid="17" name="tiles" tilewidth="32" tileheight="32">
   <image source="tiles.png" width="128" height="128"/>
+  <tile id="12">
+   <properties>
+    <property name="probability" value="10"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="wall" width="24" height="22" opacity="0.15">
   <data>
@@ -819,7 +824,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="5"/>
+   <tile gid="1"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -1657,10 +1662,10 @@
   </data>
  </layer>
  <objectgroup name="snake_objs">
-  <object id="22" name="SmartSnake" type="enemy" x="272" y="304">
+  <object name="SmartSnake" type="enemy" x="272" y="304">
    <properties>
     <property name="direction" value="1"/>
-    <property name="speed" value="40"/>
+    <property name="speed" value="30"/>
    </properties>
   </object>
  </objectgroup>

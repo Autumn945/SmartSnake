@@ -186,6 +186,17 @@ void MyGame::update(float dt) {
 			}
 		}
 	}
+	int alive = 0;
+	for (auto snake : snakes) {
+		if (!snake->get_is_died()) {
+			alive++;
+		}
+	}
+	if (!has_player && alive == 0) {
+		this->removeAllChildren();
+		this->init(this->getTag());
+		return;
+	}
 	auto time_b = clock();
 	for (auto snake : snakes) {
 		snake->go_step();
@@ -198,16 +209,6 @@ void MyGame::update(float dt) {
 		if (!snake->get_is_checked()) {
 			snake->check();
 		}
-	}
-	int alive = 0;
-	for (auto snake : snakes) {
-		if (!snake->get_is_died()) {
-			alive++;
-		}
-	}
-	if (!has_player && alive == 0) {
-		this->removeAllChildren();
-		this->init(this->getTag());
 	}
 	if (has_player && !snakes[0]->get_is_died() && player_go) {
 		update_dir();

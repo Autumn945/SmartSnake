@@ -213,8 +213,8 @@ bool Snake::check() {
 	}
 	is_checked = true;
 	auto game = (MyGame*)game_map->getParent();
-	if (game_map->is_wall(position)) {
-		log("%s p wall", this->getName().c_str());
+	if (game_map->wall_id(position)) {
+		log("%s p wall, length = %d, empty = %d", this->getName().c_str(), this->get_length(), game_map->get_empty_n());
 		this->go_die();
 		if (this->get_type() == SnakeType::t_player) {
 			game->game_over(MyGame::gameOverState::impact_wall);
@@ -228,10 +228,10 @@ bool Snake::check() {
 	else if (sp != this->snake_nodes->back()) {
 		auto snk = (Snake*)sp->getParent();
 		if (snk == NULL) {
-			log("%s p NULL", this->getName().c_str());
+			log("%s p NULL, length = %d, empty = %d", this->getName().c_str(), this->get_length(), game_map->get_empty_n());
 		}
 		else {
-			log("%s p %s", this->getName().c_str(), snk->getName().c_str());
+			log("%s p %s, length = %d, empty = %d", this->getName().c_str(), snk->getName().c_str(), this->get_length(), game_map->get_empty_n());
 		}
 		this->go_die();
 		if (this->get_type() == SnakeType::t_player) {
